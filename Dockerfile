@@ -97,4 +97,8 @@ RUN ls -la storage/framework/cache/ && \
 EXPOSE 8080
 
 # Démarrer l'application
+
+COPY start.sh /usr/local/bin/start.sh
+RUN chmod +x /usr/local/bin/start.sh
 CMD ["/usr/local/bin/start.sh"]
+
