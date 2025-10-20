@@ -15,7 +15,8 @@ return new class extends Migration
             
             $table->id(); // clé primaire auto-incrémentée
             $table->unsignedBigInteger('user_id'); // clé étrangère vers users
-            $table->unsignedBigInteger('qr_token_id')->nullable();
+            // $table->unsignedBigInteger('qr_tokens_id')->nullable();
+            $table->foreignId('qr_token_id')->nullable()->constrained('qr_tokens')->onDelete('set null');
             $table->enum('statut', ['present', 'retard', 'absent'])->default('absent');
             $table->time('heure_arrivee')->nullable();
             $table->time('heure_sortie')->nullable();

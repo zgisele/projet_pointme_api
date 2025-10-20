@@ -4,9 +4,12 @@ return [
     'default' => 'default',
     'documentations' => [
         'default' => [
+
             'api' => [
                 'title' => 'L5 Swagger UI',
             ],
+
+            'generate_always' => true,
 
             'routes' => [
                 /*
