@@ -96,4 +96,47 @@ class User extends Authenticatable implements JWTSubject,FilamentUser, HasName, 
     {
         return $this->photo ? asset('storage/' . $this->photo) : null;
     }
+
+
+
+    
+    // Pour les relations coach ↔ stagiaires
+    public function stagiaires()
+    {
+        return $this->belongsToMany(User::class, 'coach_stagiaire', 'coach_id', 'stagiaire_id');
+    }
+
+    public function coachs()
+    {
+        return $this->belongsToMany(User::class, 'coach_stagiaire', 'stagiaire_id', 'coach_id');
+    }
+
+    // Pointages du stagiaire
+    public function pointages()
+    {
+        return $this->hasMany(Pointage::class);
+    }
+
+    // Sanctions données ou reçues
+    public function sanctionsDonnees()
+    {
+        return $this->hasMany(Sanction::class, 'coach_id');
+    }
+
+    public function sanctionsRecues()
+    {
+        return $this->hasMany(Sanction::class, 'stagiaire_id');
+    }
+
+    // QR Tokens créés par l'utilisateur (coach/admin)
+    public function qrTokens()
+    {
+        return $this->hasMany(QrToken::class, 'created_by');
+    }
+
+    // Notifications reçues
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
 }

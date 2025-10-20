@@ -7,6 +7,13 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use App\Models\User;
+/**
+ * @OA\Info(
+ *     version="1.0.0",
+ *     title="Mon API",
+ *     description="Documentation complète de l'API",
+ * )
+ */
 
 class AuthController extends Controller
 {
@@ -16,56 +23,61 @@ class AuthController extends Controller
     /** =========================
      *   ADMIN REGISTRATION
      *  ========================= */
-    // public function registerAdmin(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'first_name' => 'required|string|max:100',
-    //         'last_name'  => 'required|string|max:100',
-    //         'email'      => 'required|email|unique:users',
-    //         'password'   => 'required|min:6',
-    //     ]);
+    
 
-    //     $user = User::create([
-    //         'first_name' => $validated['first_name'],
-    //         'last_name'  => $validated['last_name'],
-    //         'email'      => $validated['email'],
-    //         'password'   => $validated['password'],
-    //         'role'       => 'admin',
-    //     ]);
+    /**
+ * @OA\Post(
+ *     path="api/register/admin",
+ *     tags={"Authentification"},
+ *     summary="Enregistrer un administrateur",
+ *     description="Création d'un administrateur avec upload de photo",
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 required={"first_name","last_name","email","password","photo"},
+ *                 @OA\Property(property="first_name", type="string", example="Alice"),
+ *                 @OA\Property(property="last_name", type="string", example="Dupont"),
+ *                 @OA\Property(property="email", type="string", format="email", example="alice@example.com"),
+ *                 @OA\Property(property="password", type="string", format="password", example="password123"),
+ *                 @OA\Property(property="photo", type="string", format="binary", description="Photo de profil")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Admin enregistré avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Admin enregistré avec succès"),
+ *             @OA\Property(property="user", type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="first_name", type="string", example="Alice"),
+ *                 @OA\Property(property="last_name", type="string", example="Dupont"),
+ *                 @OA\Property(property="email", type="string", example="alice@example.com"),
+ *                 @OA\Property(property="photo", type="string", example="photos/photo1.jpg")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=422,
+ *         description="Validation échouée",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Validation échouée"),
+ *             @OA\Property(property="errors", type="object")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=500,
+ *         description="Erreur serveur",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Erreur serveur"),
+ *             @OA\Property(property="error", type="string", example="Détails de l'erreur")
+ *         )
+ *     )
+ * )
+ */
 
-    //         $token = JWTAuth::fromUser($user);
-
-    //     return response()->json([
-    //         'message' => 'Admin créé avec succès',
-    //         'user' => $user,
-    //         'token' => $token,
-    //     ], 201);
-    // }   
-    // public function registerAdmin(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'first_name' => 'required|string',
-    //         'last_name' => 'required|string',
-    //         'email' => 'required|email|unique:users',
-    //         'password' => 'required|string|min:6',
-    //         'photo' => 'required|image|mimes:jpg,png,jpeg|max:2048',
-    //     ]);
-
-    //     if ($request->hasFile('photo')) {
-    //         $photoPath = $request->file('photo')->store('photos', 'public');
-    //         $validated['photo'] = $photoPath;
-    //     }
-
-    //     $validated['password'] = bcrypt($validated['password']);
-    //     $validated['role'] = 'admin';
-
-    //     $user = User::create($validated);
-
-    //     return response()->json([
-    //         'message' => 'Admin enregistré avec succès',
-    //         'user' => $user
-    //     ], 201);
-    // }
     public function registerAdmin(Request $request)
     {
         try {
@@ -110,35 +122,7 @@ class AuthController extends Controller
      /** =========================
      *   COACH REGISTRATION
      *  ========================= */
-    // public function registerCoache(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'first_name' => 'required|string|max:100',
-    //         'last_name'  => 'required|string|max:100',
-    //         'email'      => 'required|email|unique:users',
-    //         'password'   => 'required|min:6',
-    //         'photo'      => 'required|image|mimes:jpg,png,jpeg|max:2048',
-    //         'phone'      => 'nullable|string|max:20',
-    //     ]);
-
-    //     $user = User::create([
-    //         'first_name' => $validated['first_name'],
-    //         'last_name'  => $validated['last_name'],
-    //         'photo'      => $validated['photo'] ?? null,
-    //         'email'      => $validated['email'],
-    //         'phone'      => $validated['phone'] ?? null,
-    //         'password'   => $validated['password'],
-    //         'role'       => 'coache',
-    //     ]);
-
-    //     $token = JWTAuth::fromUser($user);
-
-    //     return response()->json([
-    //         'message' => 'Coach créé avec succès',
-    //         'user' => $user,
-    //         'token' => $token,
-    //     ], 201); 
-    // }
+    
         public function registerCoache(Request $request)
         {
              $user = $request->user();
@@ -184,37 +168,7 @@ class AuthController extends Controller
     /** =========================
      *   STAGIAIRE REGISTRATION
      *  ========================= */
-    // public function registerStagiaire(Request $request)
-    // {
-    //     $validated = $request->validate([
-    //         'first_name' => 'required|string|max:100',
-    //         'last_name'  => 'required|string|max:100',
-    //         'email'      => 'required|email|unique:users',
-    //         'password'   => 'required|min:6',
-    //         'promotion'  => 'nullable|string|max:50',
-    //         'start_date' => 'nullable|date',
-    //         'end_date'   => 'nullable|date',
-    //     ]);
-
-    //     $user = User::create([
-    //         'first_name' => $validated['first_name'],
-    //         'last_name'  => $validated['last_name'],
-    //         'email'      => $validated['email'],
-    //         'promotion'  => $validated['promotion'] ?? null,
-    //         'start_date' => $validated['start_date'] ?? null,
-    //         'end_date'   => $validated['end_date'] ?? null,
-    //         'password'   => $validated['password'],
-    //         'role'       => 'stagiaire',
-    //     ]);
-
-    //     $token = JWTAuth::fromUser($user);
-
-    //     return response()->json([
-    //         'message' => 'Stagiaire créé avec succès',
-    //         'user' => $user,
-    //         'token' => $token,
-    //     ], 201);
-    // }
+    
          public function registerStagiaire(Request $request)
         {
             try {
@@ -264,63 +218,27 @@ class AuthController extends Controller
     /** =========================
      *   AUTHENTICATION
      *  ========================= */
-    // public function login(Request $request)
-    // {
-    //     $credentials = $request->only('email', 'password');
+    /**
+     * @OA\Post(
+     *     path="/api/login",
+     *     summary="Connexion utilisateur",
+     *     tags={"Auth"},
+     *     @OA\RequestBody(
+     *         required=true,
+     *         @OA\MediaType(
+     *           mediaType="multipart/form-data",
+     *           @OA\Schema(
+     *             required={"email","password"},
+     *             @OA\Property(property="email", type="string", format="email", example="user@example.com"),
+     *             @OA\Property(property="password", type="string", format="password", example="secret123")
+     *           )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Connexion réussie"),
+     *     @OA\Response(response=401, description="Identifiants invalides")
+     * )
+     */
 
-    //     if (!$token = Auth::attempt($credentials)) {
-    //         return response()->json(['error' => 'Identifiants invalides'], 401);
-    //     }
-
-    //     return response()->json([
-    //         'message' => 'Connexion réussie',
-    //         'token'   => $token,
-    //         'user'    => Auth::user(),
-    //     ]);
-    // }
-    // public function login(Request $request)
-    // {
-    //     // 1️⃣ Validation
-    //     $validator = Validator::make($request->all(), [
-    //         'email' => 'required|email',
-    //         'password' => 'required|string|min:6',
-    //     ]);
-
-    //     if ($validator->fails()) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'errors' => $validator->errors()
-    //         ], 422);
-    //     }
-
-    //     $credentials = $request->only('email', 'password');
-
-    //     // 2️⃣ Tentative d'authentification et génération du token
-    //     try {
-    //         if (!$token = JWTAuth::attempt($credentials)) {
-    //             return response()->json([
-    //                 'success' => false,
-    //                 'message' => 'Identifiants invalides'
-    //             ], 401);
-    //         }
-    //     } catch (JWTException $e) {
-    //         return response()->json([
-    //             'success' => false,
-    //             'message' => 'Impossible de créer le token'
-    //         ], 500);
-    //     }
-
-    //     // 3️⃣ Réponse avec token et infos utilisateur
-    //     return response()->json([
-    //         'success' => true,
-    //         'message' => 'Connexion réussie',
-    //         'user' => auth()->user(),
-    //         'access_token' => $token,
-    //         'token_type' => 'bearer',
-    //         'expires_in' => auth()->factory()->getTTL() * 60
-    //     ]);
-
-    // }
     public function login(Request $request)
     {
         $request->validate([
@@ -332,6 +250,13 @@ class AuthController extends Controller
             return response()->json(['error' => 'Identifiants invalides'], 401);
         }
 
+        $user = auth()->user();
+
+        // Vérification du rôle
+        if (!in_array($user->role, ['coache', 'stagiaire'])) {
+            return response()->json(['error' => 'Accès non autorisé'], 403);
+        }
+
         return response()->json([
             'message' => 'Connexion réussie',
             'user' => auth()->user(),
@@ -340,11 +265,34 @@ class AuthController extends Controller
             // 'expires_in' => auth()->factory()->getTTL() * 60
         ]);
     }
+
+
+   
+    /**
+     * @OA\Get(
+     *     path="/api/me",
+     *     summary="Profil de l'utilisateur connecté",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Utilisateur connecté"),
+     *     @OA\Response(response=401, description="Non authentifié")
+     * )
+     */
     public function me()
     {
         return response()->json(Auth::user());
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/logout",
+     *     summary="Déconnexion de l'utilisateur",
+     *     tags={"Auth"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Déconnexion réussie"),
+     *     @OA\Response(response=401, description="Non authentifié")
+     * )
+    */
     public function logout()
     {
         Auth::logout();

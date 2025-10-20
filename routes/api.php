@@ -26,6 +26,8 @@ Route::post('register/admin', [AuthController::class, 'registerAdmin']);
 // Route::post('register/stagiaire', [AuthController::class, 'registerStagiaire']);
 
 Route::post('login', [AuthController::class, 'login']);
+Route::get('me', [AuthController::class, 'me']);
+Route::post('logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:api')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
