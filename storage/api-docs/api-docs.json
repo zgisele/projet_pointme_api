@@ -6,14 +6,14 @@
         "version": "1.0.0"
     },
     "paths": {
-        "api/register/admin": {
+        "/api/register/admin": {
             "post": {
                 "tags": [
-                    "Authentification"
+                    "USER"
                 ],
-                "summary": "Enregistrer un administrateur",
-                "description": "Création d'un administrateur avec upload de photo",
-                "operationId": "c0561511cb985d75f74656eeac283cc9",
+                "summary": "Enregistrer un nouvel administrateur",
+                "description": "Crée un compte administrateur avec validation, upload de photo et hachage du mot de passe.",
+                "operationId": "40f1c8b1f404c3f496a210b667119a66",
                 "requestBody": {
                     "required": true,
                     "content": {
@@ -29,7 +29,7 @@
                                 "properties": {
                                     "first_name": {
                                         "type": "string",
-                                        "example": "Alice"
+                                        "example": "Jean"
                                     },
                                     "last_name": {
                                         "type": "string",
@@ -38,15 +38,15 @@
                                     "email": {
                                         "type": "string",
                                         "format": "email",
-                                        "example": "alice@example.com"
+                                        "example": "jean.dupont@gmail.com"
                                     },
                                     "password": {
                                         "type": "string",
                                         "format": "password",
-                                        "example": "password123"
+                                        "example": "secret123"
                                     },
                                     "photo": {
-                                        "description": "Photo de profil",
+                                        "description": "Image de profil (jpg, jpeg, png)",
                                         "type": "string",
                                         "format": "binary"
                                     }
@@ -75,7 +75,7 @@
                                                 },
                                                 "first_name": {
                                                     "type": "string",
-                                                    "example": "Alice"
+                                                    "example": "Jean"
                                                 },
                                                 "last_name": {
                                                     "type": "string",
@@ -83,11 +83,15 @@
                                                 },
                                                 "email": {
                                                     "type": "string",
-                                                    "example": "alice@example.com"
+                                                    "example": "jean.dupont@gmail.com"
                                                 },
                                                 "photo": {
                                                     "type": "string",
-                                                    "example": "photos/photo1.jpg"
+                                                    "example": "photos/jean_photo.jpg"
+                                                },
+                                                "role": {
+                                                    "type": "string",
+                                                    "example": "admin"
                                                 }
                                             },
                                             "type": "object"
@@ -99,7 +103,7 @@
                         }
                     },
                     "422": {
-                        "description": "Validation échouée",
+                        "description": "Erreurs de validation",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -109,6 +113,15 @@
                                             "example": "Validation échouée"
                                         },
                                         "errors": {
+                                            "properties": {
+                                                "email": {
+                                                    "type": "array",
+                                                    "items": {
+                                                        "type": "string",
+                                                        "example": "L'email est déjà utilisé"
+                                                    }
+                                                }
+                                            },
                                             "type": "object"
                                         }
                                     },
@@ -118,7 +131,7 @@
                         }
                     },
                     "500": {
-                        "description": "Erreur serveur",
+                        "description": "Erreur interne du serveur",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -129,7 +142,7 @@
                                         },
                                         "error": {
                                             "type": "string",
-                                            "example": "Détails de l'erreur"
+                                            "example": "SQLSTATE[HY000] ..."
                                         }
                                     },
                                     "type": "object"
@@ -143,7 +156,7 @@
         "/api/login": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "USER"
                 ],
                 "summary": "Connexion utilisateur",
                 "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
@@ -186,7 +199,7 @@
         "/api/me": {
             "get": {
                 "tags": [
-                    "Auth"
+                    "USER"
                 ],
                 "summary": "Profil de l'utilisateur connecté",
                 "operationId": "9d9bc556f927575aa492a88c28fe5908",
@@ -208,7 +221,7 @@
         "/api/logout": {
             "post": {
                 "tags": [
-                    "Auth"
+                    "USER"
                 ],
                 "summary": "Déconnexion de l'utilisateur",
                 "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
@@ -230,12 +243,8 @@
     },
     "tags": [
         {
-            "name": "Authentification",
-            "description": "Authentification"
-        },
-        {
-            "name": "Auth",
-            "description": "Auth"
+            "name": "USER",
+            "description": "USER"
         }
     ],
     "components": {

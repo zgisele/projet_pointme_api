@@ -25,26 +25,29 @@ class AuthController extends Controller
      *  ========================= */
     
 
-    /**
+
+/**
  * @OA\Post(
- *     path="api/register/admin",
- *     tags={"Authentification"},
- *     summary="Enregistrer un administrateur",
- *     description="Création d'un administrateur avec upload de photo",
+ *     path="/api/register/admin",
+ *     summary="Enregistrer un nouvel administrateur",
+ *     description="Crée un compte administrateur avec validation, upload de photo et hachage du mot de passe.",
+ *     tags={"USER"},
+ *     
  *     @OA\RequestBody(
  *         required=true,
  *         @OA\MediaType(
  *             mediaType="multipart/form-data",
  *             @OA\Schema(
- *                 required={"first_name","last_name","email","password","photo"},
- *                 @OA\Property(property="first_name", type="string", example="Alice"),
+ *                 required={"first_name", "last_name", "email", "password", "photo"},
+ *                 @OA\Property(property="first_name", type="string", example="Jean"),
  *                 @OA\Property(property="last_name", type="string", example="Dupont"),
- *                 @OA\Property(property="email", type="string", format="email", example="alice@example.com"),
- *                 @OA\Property(property="password", type="string", format="password", example="password123"),
- *                 @OA\Property(property="photo", type="string", format="binary", description="Photo de profil")
+ *                 @OA\Property(property="email", type="string", format="email", example="jean.dupont@gmail.com"),
+ *                 @OA\Property(property="password", type="string", format="password", example="secret123"),
+ *                 @OA\Property(property="photo", type="string", format="binary", description="Image de profil (jpg, jpeg, png)")
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=201,
  *         description="Admin enregistré avec succès",
@@ -52,31 +55,36 @@ class AuthController extends Controller
  *             @OA\Property(property="message", type="string", example="Admin enregistré avec succès"),
  *             @OA\Property(property="user", type="object",
  *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="first_name", type="string", example="Alice"),
+ *                 @OA\Property(property="first_name", type="string", example="Jean"),
  *                 @OA\Property(property="last_name", type="string", example="Dupont"),
- *                 @OA\Property(property="email", type="string", example="alice@example.com"),
- *                 @OA\Property(property="photo", type="string", example="photos/photo1.jpg")
+ *                 @OA\Property(property="email", type="string", example="jean.dupont@gmail.com"),
+ *                 @OA\Property(property="photo", type="string", example="photos/jean_photo.jpg"),
+ *                 @OA\Property(property="role", type="string", example="admin")
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=422,
- *         description="Validation échouée",
+ *         description="Erreurs de validation",
  *         @OA\JsonContent(
  *             @OA\Property(property="message", type="string", example="Validation échouée"),
- *             @OA\Property(property="errors", type="object")
+ *             @OA\Property(property="errors", type="object",
+ *                 @OA\Property(property="email", type="array", @OA\Items(type="string", example="L'email est déjà utilisé"))
+ *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
  *         response=500,
- *         description="Erreur serveur",
+ *         description="Erreur interne du serveur",
  *         @OA\JsonContent(
  *             @OA\Property(property="message", type="string", example="Erreur serveur"),
- *             @OA\Property(property="error", type="string", example="Détails de l'erreur")
+ *             @OA\Property(property="error", type="string", example="SQLSTATE[HY000] ...")
  *         )
  *     )
  * )
- */
+*/
 
     public function registerAdmin(Request $request)
     {
@@ -222,7 +230,7 @@ class AuthController extends Controller
      * @OA\Post(
      *     path="/api/login",
      *     summary="Connexion utilisateur",
-     *     tags={"Auth"},
+     *     tags={"USER"},
      *     @OA\RequestBody(
      *         required=true,
      *         @OA\MediaType(
@@ -272,7 +280,7 @@ class AuthController extends Controller
      * @OA\Get(
      *     path="/api/me",
      *     summary="Profil de l'utilisateur connecté",
-     *     tags={"Auth"},
+     *     tags={"USER"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="Utilisateur connecté"),
      *     @OA\Response(response=401, description="Non authentifié")
@@ -287,7 +295,7 @@ class AuthController extends Controller
      * @OA\Post(
      *     path="/api/logout",
      *     summary="Déconnexion de l'utilisateur",
-     *     tags={"Auth"},
+     *     tags={"USER"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="Déconnexion réussie"),
      *     @OA\Response(response=401, description="Non authentifié")

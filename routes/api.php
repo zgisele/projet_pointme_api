@@ -30,8 +30,6 @@ Route::get('me', [AuthController::class, 'me']);
 Route::post('logout', [AuthController::class, 'logout']);
 
 Route::middleware('auth:api')->group(function () {
-    Route::get('me', [AuthController::class, 'me']);
-    Route::post('logout', [AuthController::class, 'logout']);
     Route::post('register/coache', [AuthController::class, 'registerCoache']);
     Route::post('register/stagiaire', [AuthController::class, 'registerStagiaire']);
 });
