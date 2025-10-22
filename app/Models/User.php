@@ -36,6 +36,7 @@ class User extends Authenticatable implements JWTSubject,FilamentUser, HasName, 
         'start_date',
         'end_date',
         'role',
+        'coach_id'
     ];
 
     /**
@@ -101,10 +102,15 @@ class User extends Authenticatable implements JWTSubject,FilamentUser, HasName, 
 
     
     // Pour les relations coach ↔ stagiaires
+    // public function stagiaires()
+    // {
+    //     return $this->belongsToMany(User::class, 'coach_stagiaire', 'coach_id', 'stagiaire_id','is_active',);
+    // }
+
     public function stagiaires()
-    {
-        return $this->belongsToMany(User::class, 'coach_stagiaire', 'coach_id', 'stagiaire_id');
-    }
+{
+    return $this->hasMany(User::class, 'coach_id')->where('role', 'stagiaire');
+}
 
     public function coachs()
     {
