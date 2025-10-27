@@ -60,9 +60,9 @@ class CoachResource extends Resource
                 ->label('Mot de passe')
                 ->password()
                 ->required(fn(string $context) => $context === 'create'),
-            // Forms\Components\Toggle::make('is_active')
-            //     ->label('Actif ?')
-            //     ->default(true),
+            Forms\Components\Toggle::make('is_active')
+                ->label('Actif ?')
+                ->default(true),
         ]);
     }
 
@@ -83,18 +83,18 @@ class CoachResource extends Resource
                 Tables\Columns\TextColumn::make('password'),
                 Tables\Columns\TextColumn::make('phone')->label('Téléphone'),
 
-                //  // ✅ Nombre de stagiaires (on ajoutera le code selon ta relation)
-                // Tables\Columns\TextColumn::make('stagiaires_count')
-                //     ->label('Nb Stagiaires')
-                //     // ->counts('stagiaires'),
-                //     ->sortable()
-                //     ->badge()
-                //     ->color(fn ($state) => $state > 0 ? 'success' : 'gray'),
+                 // ✅ Nombre de stagiaires (on ajoutera le code selon ta relation)
+                Tables\Columns\TextColumn::make('stagiaires_count')
+                    ->label('Nb Stagiaires')
+                    ->counts('stagiaires'),
+                    // ->sortable()
+                    // ->badge()
+                    // ->color(fn ($state) => $state > 0 ? 'success' : 'gray'),
 
-                // // ✅ Statut actif / inactif
-                // Tables\Columns\IconColumn::make('is_active')
-                //     ->boolean()
-                //     ->label('Actif ?'),
+                // ✅ Statut actif / inactif
+                Tables\Columns\IconColumn::make('is_active')
+                    ->boolean()
+                    ->label('Actif ?'),
             ])
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')

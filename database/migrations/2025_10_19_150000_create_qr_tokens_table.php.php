@@ -17,7 +17,9 @@ return new class extends Migration
             $table->unsignedBigInteger('created_by'); // Coach ou Admin
             $table->dateTime('valid_until');
             $table->boolean('is_active')->default(true);
-            $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('qr_token_id')->nullable()->constrained()->onDelete('set null');
+
             $table->timestamps();
         });
     }

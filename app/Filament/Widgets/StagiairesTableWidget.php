@@ -7,62 +7,62 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 
-class StagiairesTableWidget extends TableWidget
-{
-    protected static ?string $heading = 'Liste des Stagiaires';
-    protected int|string|array $columnSpan = 'full';
+// class StagiairesTableWidget extends TableWidget
+// {
+//     protected static ?string $heading = 'Liste des Stagiaires';
+//     protected int|string|array $columnSpan = 'full';
 
-    public function table(Table $table): Table
-    {
-        return $table
-            ->query(
-                User::query()->where('role', 'stagiaire')
-            )
-            ->columns([
-                Tables\Columns\ImageColumn::make('photo')
-                    ->label('Photo')
-                    ->circular()
-                    ->size(40),
+//     public function table(Table $table): Table
+//     {
+//         return $table
+//             ->query(
+//                 User::query()->where('role', 'stagiaire')
+//             )
+//             ->columns([
+//                 Tables\Columns\ImageColumn::make('photo')
+//                     ->label('Photo')
+//                     ->circular()
+//                     ->size(40),
 
-                Tables\Columns\TextColumn::make('first_name')
-                    ->label('Prénom')
-                    ->searchable()
-                    ->sortable(),
+//                 Tables\Columns\TextColumn::make('first_name')
+//                     ->label('Prénom')
+//                     ->searchable()
+//                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('last_name')
-                    ->label('Nom')
-                    ->searchable()
-                    ->sortable(),
+//                 Tables\Columns\TextColumn::make('last_name')
+//                     ->label('Nom')
+//                     ->searchable()
+//                     ->sortable(),
 
-                Tables\Columns\TextColumn::make('email')
-                    ->label('Email')
-                    ->searchable(),
+//                 Tables\Columns\TextColumn::make('email')
+//                     ->label('Email')
+//                     ->searchable(),
 
-                Tables\Columns\TextColumn::make('phone')
-                    ->label('Téléphone'),
+//                 Tables\Columns\TextColumn::make('phone')
+//                     ->label('Téléphone'),
 
-                Tables\Columns\TextColumn::make('promotion')
-                    ->label('Promotion'),
+//                 Tables\Columns\TextColumn::make('promotion')
+//                     ->label('Promotion'),
 
-                Tables\Columns\TextColumn::make('start_date')
-                    ->label('Début')
-                    ->date(),
+//                 Tables\Columns\TextColumn::make('start_date')
+//                     ->label('Début')
+//                     ->date(),
 
-                Tables\Columns\TextColumn::make('end_date')
-                    ->label('Fin')
-                    ->date(),
-            ])
-            ->actions([
-                Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
-            ])
-            ->bulkActions([
-                Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
-                ]),
-            ]);
-    }
-}
+//                 Tables\Columns\TextColumn::make('end_date')
+//                     ->label('Fin')
+//                     ->date(),
+//             ])
+//             ->actions([
+//                 Tables\Actions\EditAction::make(),
+//                 Tables\Actions\DeleteAction::make(),
+//             ])
+//             ->bulkActions([
+//                 Tables\Actions\BulkActionGroup::make([
+//                     Tables\Actions\DeleteBulkAction::make(),
+//                 ]),
+//             ]);
+//     }
+// }
 
 
 

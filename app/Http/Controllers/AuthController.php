@@ -10,7 +10,7 @@ use App\Models\User;
 /**
  * @OA\Info(
  *     version="1.0.0",
- *     title="Mon API",
+ *     title="Pointme-Api",
  *     description="Documentation complète de l'API",
  * )
  */
@@ -229,7 +229,7 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/login",
-     *     summary="Connexion utilisateur",
+     *     summary="Connexion utilisateur (coach et stagiaire)",
      *     tags={"USER"},
      *     @OA\RequestBody(
      *         required=true,
@@ -279,7 +279,7 @@ class AuthController extends Controller
     /**
      * @OA\Get(
      *     path="/api/me",
-     *     summary="Profil de l'utilisateur connecté",
+     *     summary="Profil de l'utilisateur connecté (coach et stagiaire)",
      *     tags={"USER"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="Utilisateur connecté"),
@@ -294,7 +294,7 @@ class AuthController extends Controller
     /**
      * @OA\Post(
      *     path="/api/logout",
-     *     summary="Déconnexion de l'utilisateur",
+     *     summary="Déconnexion de l'utilisateur (coach et stagiaire)",
      *     tags={"USER"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="Déconnexion réussie"),

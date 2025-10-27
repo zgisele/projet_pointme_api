@@ -1,7 +1,7 @@
 {
     "openapi": "3.0.0",
     "info": {
-        "title": "Mon API",
+        "title": "Pointme-Api",
         "description": "Documentation complète de l'API",
         "version": "1.0.0"
     },
@@ -158,7 +158,7 @@
                 "tags": [
                     "USER"
                 ],
-                "summary": "Connexion utilisateur",
+                "summary": "Connexion utilisateur (coach et stagiaire)",
                 "operationId": "a3b306d14572d1f4bd6c064b3233e7b8",
                 "requestBody": {
                     "required": true,
@@ -201,7 +201,7 @@
                 "tags": [
                     "USER"
                 ],
-                "summary": "Profil de l'utilisateur connecté",
+                "summary": "Profil de l'utilisateur connecté (coach et stagiaire)",
                 "operationId": "9d9bc556f927575aa492a88c28fe5908",
                 "responses": {
                     "200": {
@@ -223,7 +223,7 @@
                 "tags": [
                     "USER"
                 ],
-                "summary": "Déconnexion de l'utilisateur",
+                "summary": "Déconnexion de l'utilisateur (coach et stagiaire)",
                 "operationId": "fe8f3429cd6979b3b4517e186505f9f9",
                 "responses": {
                     "200": {

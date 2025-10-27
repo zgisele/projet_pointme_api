@@ -14,9 +14,23 @@ return new class extends Migration
         Schema::create('pointages', function (Blueprint $table) {
             
             $table->id(); // clé primaire auto-incrémentée
-            $table->unsignedBigInteger('user_id'); // clé étrangère vers users
+            // $table->unsignedBigInteger('user_id'); // clé étrangère vers users
+            $table->foreignId('user_id')->constrained()->onDelete('cascade');
+
+            //Crée d’abord la colonne
+            $table->unsignedBigInteger('qr_token_id')->nullable();
+            // Puis ajoute la clé étrangère avec un nom explicite
+            $table->foreign('qr_token_id', 'fk_pointages_qr_token')
+                ->references('id')->on('qr_tokens')
+              ->onDelete('set null');
+
             // $table->unsignedBigInteger('qr_tokens_id')->nullable();
-            $table->foreignId('qr_token_id')->nullable()->constrained('qr_tokens')->onDelete('set null');
+            // // $table->foreignId('qr_token_id')->nullable()->constrained('qr_tokens')->onDelete('set null');
+            // // Nom explicite de la contrainte pour éviter les doublons
+            // $table->foreign('qr_token_id', 'fk_pointages_qr_token')
+            //   ->references('id')->on('qr_tokens')
+            //   ->onDelete('set null');
+
             $table->enum('statut', ['present', 'retard', 'absent'])->default('absent');
             $table->time('heure_arrivee')->nullable();
             $table->time('heure_sortie')->nullable();
@@ -25,8 +39,8 @@ return new class extends Migration
             $table->timestamps();
 
             // Relations
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-            $table->foreign('qr_token_id')->references('id')->on('qr_tokens')->onDelete('set null');
+            // $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            // $table->foreign('qr_token_id')->references('id')->on('qr_tokens')->onDelete('set null');
 
             $table->unique(['user_id', 'date_pointage']); // 1 pointage par jour
        
