@@ -1,6 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
+use Illuminate\Http\Request;
+
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -10,112 +12,151 @@ class Controller extends BaseController
 {
     use AuthorizesRequests, ValidatesRequests;
 
-    /**
-     * @OA\Post(
-     *     path="api/register/admin",
-     *     tags={"Authentification"},
-     *     summary="Enregistrer un administrateur",
-     *     description="Création d'un administrateur avec photo",
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\MediaType(
-     *             mediaType="multipart/form-data",
-     *             @OA\Schema(
-     *                 required={"first_name","last_name","email","password","photo"},
-     *                 @OA\Property(property="first_name", type="string", example="John"),
-     *                 @OA\Property(property="last_name", type="string", example="Doe"),
-     *                 @OA\Property(property="email", type="string", format="email", example="admin@example.com"),
-     *                 @OA\Property(property="password", type="string", format="password", example="secret123"),
-     *                 @OA\Property(property="photo", type="string", format="binary", description="Photo de profil au format jpg/png/jpeg")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=201,
-     *         description="Admin enregistré avec succès",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Admin enregistré avec succès"),
-     *             @OA\Property(property="user", type="object",
-     *                 @OA\Property(property="id", type="integer"),
-     *                 @OA\Property(property="first_name", type="string"),
-     *                 @OA\Property(property="last_name", type="string"),
-     *                 @OA\Property(property="email", type="string"),
-     *                 @OA\Property(property="photo", type="string")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Validation échouée",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Validation échouée"),
-     *             @OA\Property(property="errors", type="object")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=500,
-     *         description="Erreur serveur",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="Erreur serveur"),
-     *             @OA\Property(property="error", type="string")
-     *         )
-     *     )
-     * )
-    */
 
-
-
-
-    /**
- * @OA\Post(
- *     path="api/register/admin",
- *     tags={"USER"},
- *     summary="Enregistrer un administrateur",
- *     description="Création d'un administrateur avec upload de photo",
- *     @OA\RequestBody(
+/**
+ * @OA\Get(
+ *     path="/api/coaches/{id}/stagiaires",
+ *     summary="Récupérer la liste des stagiaires d’un coach",
+ *     description="Retourne la liste des stagiaires associés à un coach spécifique. Accessible uniquement aux utilisateurs ayant le rôle 'coache'.",
+ *     tags={"Coach"},
+ *     security={{"bearerAuth": {}}},
+ *
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
  *         required=true,
- *         @OA\MediaType(
- *             mediaType="multipart/form-data",
- *             @OA\Schema(
- *                 required={"first_name","last_name","email","password","photo"},
- *                 @OA\Property(property="first_name", type="string", example="Alice"),
- *                 @OA\Property(property="last_name", type="string", example="Dupont"),
- *                 @OA\Property(property="email", type="string", format="email", example="alice@example.com"),
- *                 @OA\Property(property="password", type="string", format="password", example="password123"),
- *                 @OA\Property(property="photo", type="string", format="binary", description="Photo de profil")
+ *         description="Identifiant du coach connecté",
+ *         @OA\Schema(type="integer", example=5)
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Liste des stagiaires récupérée avec succès",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="stagiaires",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id", type="integer", example=10),
+ *                     @OA\Property(property="first_name", type="string", example="Jean"),
+ *                     @OA\Property(property="last_name", type="string", example="Dupont"),
+ *                     @OA\Property(property="email", type="string", example="jean.dupont@example.com")
+ *                 )
  *             )
  *         )
  *     ),
+ *
  *     @OA\Response(
- *         response=201,
- *         description="Admin enregistré avec succès",
+ *         response=403,
+ *         description="Accès non autorisé (l'utilisateur n'est pas le coach concerné ou n'a pas le bon rôle)",
  *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Admin enregistré avec succès"),
- *             @OA\Property(property="user", type="object",
- *                 @OA\Property(property="id", type="integer", example=1),
- *                 @OA\Property(property="first_name", type="string", example="Alice"),
- *                 @OA\Property(property="last_name", type="string", example="Dupont"),
- *                 @OA\Property(property="email", type="string", example="alice@example.com"),
- *                 @OA\Property(property="photo", type="string", example="photos/photo1.jpg")
- *             )
+ *             @OA\Property(property="message", type="string", example="Accès non autorisé.")
  *         )
  *     ),
+ *
  *     @OA\Response(
- *         response=422,
- *         description="Validation échouée",
+ *         response=401,
+ *         description="Token invalide ou expiré",
  *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Validation échouée"),
- *             @OA\Property(property="errors", type="object")
- *         )
- *     ),
- *     @OA\Response(
- *         response=500,
- *         description="Erreur serveur",
- *         @OA\JsonContent(
- *             @OA\Property(property="message", type="string", example="Erreur serveur"),
- *             @OA\Property(property="error", type="string", example="Détails de l'erreur")
+ *             @OA\Property(property="message", type="string", example="Token invalide ou expiré")
  *         )
  *     )
  * )
 */
+
+
+        public function getStagiaires(Request $request, $id)
+    {
+        $user = auth()->user();
+
+        if ($user->id != $id || $user->role != 'coache') {
+            return response()->json(['message' => 'Accès non autorisé2.'], 403);
+        }
+
+        $stagiaires = $user->stagiaires()->get(['id', 'first_name', 'last_name', 'email']);
+
+        return response()->json(['stagiaires' => $stagiaires], 200);
+    }
+
+
+/**
+ * @OA\Get(
+ *     path="/api/stagiaires/{id}",
+ *     summary="Consulter le profil détaillé d’un stagiaire",
+ *     description="Permet à un coach authentifié de consulter les informations détaillées d’un stagiaire spécifique.",
+ *     tags={"Coach"},
+ *     security={{"bearerAuth": {}}},
+ *
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="Identifiant du stagiaire à consulter",
+ *         @OA\Schema(type="integer", example=8)
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profil détaillé du stagiaire récupéré avec succès",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="id", type="integer", example=8),
+ *             @OA\Property(property="first_name", type="string", example="Aminata"),
+ *             @OA\Property(property="last_name", type="string", example="Sow"),
+ *             @OA\Property(property="email", type="string", example="aminata.sow@example.com"),
+ *             @OA\Property(property="phone", type="string", example="+221772233445"),
+ *             @OA\Property(property="formation", type="string", example="Développement web"),
+ *             @OA\Property(property="coach_id", type="integer", example=3),
+ *             @OA\Property(property="created_at", type="string", format="date-time", example="2025-10-28T09:00:00Z")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=403,
+ *         description="Accès non autorisé (l’utilisateur n’est pas un coach ou n’a pas accès à ce stagiaire)",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Accès non autorisé.")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Stagiaire non trouvé",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Stagiaire introuvable.")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=401,
+ *         description="Token invalide ou expiré",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Token invalide ou expiré")
+ *         )
+ *     )
+ * )
+ */
+
+    public function showStagiaire(Request $request, $id)
+{
+    $user = auth()->user();
+
+    if (!$user || $user->role !== 'coache') {
+        return response()->json(['message' => 'Accès non autorisé.'], 403);
+    }
+
+    $stagiaire = \App\Models\User::where('id', $id)
+        ->where('coach_id', $user->id)
+        ->where('role', 'stagiaire')
+        ->first();
+
+    if (!$stagiaire) {
+        return response()->json(['message' => 'Stagiaire introuvable.'], 404);
+    }
+
+    return response()->json($stagiaire, 200);
+}
+
 }

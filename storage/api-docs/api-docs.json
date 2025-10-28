@@ -196,13 +196,35 @@
                 }
             }
         },
-        "/api/me": {
+        "/api/profileCoach": {
             "get": {
                 "tags": [
                     "USER"
                 ],
-                "summary": "Profil de l'utilisateur connecté (coach et stagiaire)",
-                "operationId": "9d9bc556f927575aa492a88c28fe5908",
+                "summary": "Profil de l'utilisateur connecté (coach)",
+                "operationId": "bae6c007cbd0d03cd1c3a5cab40d7eed",
+                "responses": {
+                    "200": {
+                        "description": "Utilisateur connecté"
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/profileStagiaire": {
+            "get": {
+                "tags": [
+                    "USER"
+                ],
+                "summary": "Profil de l'utilisateur connecté (stagiaire)",
+                "operationId": "aec70e4426b5b2b3f0dad735548605b0",
                 "responses": {
                     "200": {
                         "description": "Utilisateur connecté"
@@ -239,12 +261,235 @@
                     }
                 ]
             }
+        },
+        "/api/coaches/{id}/stagiaires": {
+            "get": {
+                "tags": [
+                    "Coach"
+                ],
+                "summary": "Récupérer la liste des stagiaires d’un coach",
+                "description": "Retourne la liste des stagiaires associés à un coach spécifique. Accessible uniquement aux utilisateurs ayant le rôle 'coache'.",
+                "operationId": "1ebe1d094a8f7637e9665342d124eda6",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du coach connecté",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des stagiaires récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "stagiaires": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 10
+                                                    },
+                                                    "first_name": {
+                                                        "type": "string",
+                                                        "example": "Jean"
+                                                    },
+                                                    "last_name": {
+                                                        "type": "string",
+                                                        "example": "Dupont"
+                                                    },
+                                                    "email": {
+                                                        "type": "string",
+                                                        "example": "jean.dupont@example.com"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès non autorisé (l'utilisateur n'est pas le coach concerné ou n'a pas le bon rôle)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Accès non autorisé."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token invalide ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token invalide ou expiré"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/stagiaires/{id}": {
+            "get": {
+                "tags": [
+                    "Coach"
+                ],
+                "summary": "Consulter le profil détaillé d’un stagiaire",
+                "description": "Permet à un coach authentifié de consulter les informations détaillées d’un stagiaire spécifique.",
+                "operationId": "be4363047c99ecdf8bd6639e1372b089",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du stagiaire à consulter",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 8
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Profil détaillé du stagiaire récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 8
+                                        },
+                                        "first_name": {
+                                            "type": "string",
+                                            "example": "Aminata"
+                                        },
+                                        "last_name": {
+                                            "type": "string",
+                                            "example": "Sow"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "example": "aminata.sow@example.com"
+                                        },
+                                        "phone": {
+                                            "type": "string",
+                                            "example": "+221772233445"
+                                        },
+                                        "formation": {
+                                            "type": "string",
+                                            "example": "Développement web"
+                                        },
+                                        "coach_id": {
+                                            "type": "integer",
+                                            "example": 3
+                                        },
+                                        "created_at": {
+                                            "type": "string",
+                                            "format": "date-time",
+                                            "example": "2025-10-28T09:00:00Z"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès non autorisé (l’utilisateur n’est pas un coach ou n’a pas accès à ce stagiaire)",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Accès non autorisé."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Stagiaire non trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Stagiaire introuvable."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Token invalide ou expiré",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Token invalide ou expiré"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
         }
     },
     "tags": [
         {
             "name": "USER",
             "description": "USER"
+        },
+        {
+            "name": "Coach",
+            "description": "Coach"
         }
     ],
     "components": {

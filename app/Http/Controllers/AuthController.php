@@ -278,15 +278,29 @@ class AuthController extends Controller
    
     /**
      * @OA\Get(
-     *     path="/api/me",
-     *     summary="Profil de l'utilisateur connecté (coach et stagiaire)",
+     *     path="/api/profileCoach",
+     *     summary="Profil de l'utilisateur connecté (coach)",
      *     tags={"USER"},
      *     security={{"bearerAuth":{}}},
      *     @OA\Response(response=200, description="Utilisateur connecté"),
      *     @OA\Response(response=401, description="Non authentifié")
      * )
      */
-    public function me()
+    public function profileCoach()
+    {
+        return response()->json(Auth::user());
+    }
+    /**
+     * @OA\Get(
+     *     path="/api/profileStagiaire",
+     *     summary="Profil de l'utilisateur connecté (stagiaire)",
+     *     tags={"USER"},
+     *     security={{"bearerAuth":{}}},
+     *     @OA\Response(response=200, description="Utilisateur connecté"),
+     *     @OA\Response(response=401, description="Non authentifié")
+     * )
+     */
+    public function profileStagiaire()
     {
         return response()->json(Auth::user());
     }

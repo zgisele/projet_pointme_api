@@ -13,7 +13,6 @@ return new class extends Migration
     {
         Schema::create('sanctions', function (Blueprint $table) {
             $table->id();
-            $table->id();
             $table->unsignedBigInteger('coach_id');
             $table->unsignedBigInteger('stagiaire_id');
             $table->string('motif');

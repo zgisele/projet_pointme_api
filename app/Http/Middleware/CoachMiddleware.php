@@ -5,6 +5,16 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Exceptions\TokenExpiredException;
+use Tymon\JWTAuth\Exceptions\TokenInvalidException;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Models\User;
+
+
+
+
+
 
 class CoachMiddleware
 {
@@ -19,13 +29,23 @@ class CoachMiddleware
         try {
             $user=JWTAuth::parseToken()->authenticate();
             //code...
-            if($user && user()-> role === 'coache'){
+            if($user && $user-> role === 'coache'){
             return $next($request);
             }
             return response()->json(['message'=>'Acces refuse:reserve aux coachs'],403);
-        } catch (\Throwable $th) {
-            //throw $th;
-             return response()->json(['message'=>'Token invalide ou expire'],401);
+        } 
+        // catch (\Throwable $th) {
+        //     //throw $th;
+        //      return response()->json(['message'=>'Token invalide ou expire'],401);
+        // }
+        catch (TokenExpiredException $e) {
+            return response()->json(['message' => 'Token expiré'], 401);
+
+        } catch (TokenInvalidException $e) {
+            return response()->json(['message' => 'Token invalide'], 401);
+
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Token absent'], 401);
         }
         // if(auth()->check() && auth()->user()-> role === 'coache'){
         //     return $next($request);

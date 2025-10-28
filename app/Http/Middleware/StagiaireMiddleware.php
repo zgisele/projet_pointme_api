@@ -5,6 +5,7 @@ namespace App\Http\Middleware;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Tymon\JWTAuth\Facades\JWTAuth;
 
 class StagiaireMiddleware
 {
@@ -15,11 +16,42 @@ class StagiaireMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // return $next($request);
-        if(auth()->check() && auth()->user()-> role === 'stagiaire'){
+
+        //  try {
+        //     $user = JWTAuth::parseToken()->authenticate();
+
+        //     if ($user && $user->role === 'stagiaire') {
+        //         return $next($request);
+        //     }
+
+        //     return response()->json(['message' => 'Accès refusé : réservé aux stagiaires.'], 403);
+        // } catch (\Exception $e) {
+        //     return response()->json(['message' => 'Token invalide ou expiré.'], 401);
+        // }
+
+         try {
+            $user=JWTAuth::parseToken()->authenticate();
+            //code...
+            if($user && $user-> role === 'stagiaire'){
             return $next($request);
+            }
+            return response()->json(['message'=>'Acces refuse:reserve aux stagiaire'],403);
+        } 
+        catch (TokenExpiredException $e) {
+            return response()->json(['message' => 'Token expiré'], 401);
+
+        } catch (TokenInvalidException $e) {
+            return response()->json(['message' => 'Token invalide'], 401);
+
+        } catch (JWTException $e) {
+            return response()->json(['message' => 'Token absent'], 401);
         }
-        return response()->json(['message'=>'Acces refuse:reserve aux stagiaire'],403);
+
+        // return $next($request);
+        // if(auth()->check() && auth()->user()-> role === 'stagiaire'){
+        //     return $next($request);
+        // }
+        // return response()->json(['message'=>'Acces refuse:reserve aux stagiaire'],403);
 
     }
 }
