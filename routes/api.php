@@ -33,18 +33,22 @@ Route::post('logout', [AuthController::class, 'logout']);
 Route::middleware('auth:api')->group(function () {
     Route::post('register/coache', [AuthController::class, 'registerCoache']);
     Route::post('register/stagiaire', [AuthController::class, 'registerStagiaire']);
+    // Route::post('logout', [AuthController::class, 'logout']);
+
 });
 
 
 Route::middleware(['jwt.auth', 'coache'])->group(function () {
     Route::get('coaches/{id}/stagiaires', [Controller::class, 'getStagiaires']);
-    Route::get('stagiaires/{id}', [Controller::class, '']);
+    Route::get('stagiaires/{id}', [Controller::class, 'showStagiaire']);
     Route::get('profileCoach', [AuthController::class, 'profileCoach']);
+    // Route::post('logoutCoache', [AuthController::class, 'logoutCoache']);
     // Route::get('/coach/dashboard', [CoachController::class, 'index']);
     // Route::post('/coach/stagiaires', [CoachController::class, 'store']);
 });
 
 Route::middleware(['jwt.auth', 'stagiaire'])->group(function () {
      Route::get('profileStagiaire', [AuthController::class, 'profileStagiaire']);
+    //  Route::post('logoutStagiaire', [AuthController::class, 'logoutStagiaire']);
    // Route::get('/stagiaire/cours', [StagiaireController::class, 'index']);
 });

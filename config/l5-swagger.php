@@ -318,12 +318,16 @@ return [
                     'use_pkce_with_authorization_code_grant' => false,
                 ],
             ],
-        ],
+       ],
+       'additional_js' => [
+        '/vendor/swagger-custom.js',
+    ],
+    ],
         /*
          * Constants which can be used in annotations
          */
         'constants' => [
             'L5_SWAGGER_CONST_HOST' => env('L5_SWAGGER_CONST_HOST', 'http://my-default-host.com'),
         ],
-    ],
+    // ],
 ];

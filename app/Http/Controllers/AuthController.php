@@ -315,9 +315,56 @@ class AuthController extends Controller
      *     @OA\Response(response=401, description="Non authentifié")
      * )
     */
-    public function logout()
+    // public function logout()
+    // {
+        // Auth::logout();
+        // return response()->json(['message' => 'Déconnexion réussie']);
+    public function logout(Request $request)
     {
-        Auth::logout();
-        return response()->json(['message' => 'Déconnexion réussie']);
+        try {
+            // Invalider le token JWT de l'utilisateur connecté
+            auth()->logout();
+
+            return response()->json([
+                'message' => 'Déconnexion réussie. Le token a été invalidé.'
+            ], 200);
+
+        } catch (\Tymon\JWTAuth\Exceptions\JWTException $e) {
+            return response()->json([
+                'error' => 'Impossible de se déconnecter, veuillez réessayer.'
+            ], 500);
+        }
     }
+
+
+    // /**
+    //  * @OA\Post(
+    //  *     path="/api/logoutCoache",
+    //  *     summary="Déconnexion de l'utilisateur (coach)",
+    //  *     tags={"USER"},
+    //  *     security={{"bearerAuth":{}}},
+    //  *     @OA\Response(response=200, description="Déconnexion réussie"),
+    //  *     @OA\Response(response=401, description="Non authentifié")
+    //  * )
+    // */
+    // public function logoutCoache()
+    // {
+    //     Auth::logout();
+    //     return response()->json(['message' => 'Déconnexion réussie']);
+    // }
+    // /**
+    //  * @OA\Post(
+    //  *     path="/api/logoutStagiaire",
+    //  *     summary="Déconnexion de l'utilisateur (stagiaire)",
+    //  *     tags={"USER"},
+    //  *     security={{"bearerAuth":{}}},
+    //  *     @OA\Response(response=200, description="Déconnexion réussie"),
+    //  *     @OA\Response(response=401, description="Non authentifié")
+    //  * )
+    // */
+    // public function logoutStagiaire()
+    // {
+    //     Auth::logout();
+    //     return response()->json(['message' => 'Déconnexion réussie']);
+    // }
 }
