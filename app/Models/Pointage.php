@@ -18,10 +18,21 @@ class Pointage extends Model
     {
         return $this->belongsTo(User::class);
     }
-
+    public function stagiaire()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     // Le QR token lié
     public function qrToken()
     {
         return $this->belongsTo(QrToken::class);
     }
+    // public function qrToken()
+    // {
+    //     return $this->belongsTo(QrToken::class, 'qr_token_id');
+    // }
+
+    
+
+    
 }

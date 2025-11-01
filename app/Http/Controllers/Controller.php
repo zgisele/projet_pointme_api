@@ -137,7 +137,7 @@ class Controller extends BaseController
  *         )
  *     )
  * )
- */
+*/
 
     public function showStagiaire(Request $request, $id)
 {

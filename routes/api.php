@@ -39,9 +39,28 @@ Route::middleware('auth:api')->group(function () {
 
 
 Route::middleware(['jwt.auth', 'coache'])->group(function () {
+    // Liste tous les stagiaires d’un coach
     Route::get('coaches/{id}/stagiaires', [Controller::class, 'getStagiaires']);
+
+    // Affiche un stagiaire spécifique
     Route::get('stagiaires/{id}', [Controller::class, 'showStagiaire']);
+
+    // Affiche le profil du coach connecté
     Route::get('profileCoach', [AuthController::class, 'profileCoach']);
+    
+    // Mise  à jour du profil coach
+    // Route::put('UpdateCoach/{id}', [AuthController::class, 'UpdateCoach']);
+    Route::post('update-coach/{id}', [AuthController::class, 'updateCoach']);
+    // Route::put('coachs/{id}', [Controller::class, 'updateCoach']);
+
+    // Visualiser tous les pointages du coach
+ // decommenter Route::get('listePointages', [PointageController::class, 'listePointages']);
+
+    // Visualiser les pointages d'une journée donnée
+    //Route::get('pointages/daily', [PointageController::class, 'daily']);
+
+    // Corriger ou valider un pointage
+   // Route::put('pointages/{id}', [PointageController::class, 'updatePointages']);
     // Route::post('logoutCoache', [AuthController::class, 'logoutCoache']);
     // Route::get('/coach/dashboard', [CoachController::class, 'index']);
     // Route::post('/coach/stagiaires', [CoachController::class, 'store']);
