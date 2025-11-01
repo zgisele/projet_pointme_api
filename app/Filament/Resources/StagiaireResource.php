@@ -34,7 +34,11 @@ class StagiaireResource extends Resource
             Forms\Components\TextInput::make('email')->email()->required(),
             Forms\Components\TextInput::make('password')->label('mot de passe'),
             Forms\Components\TextInput::make('phone')->label('Téléphone'),
-            Forms\Components\FileUpload::make('photo')->directory('photos')->label('Photo'),
+            Forms\Components\FileUpload::make('photo')
+            ->disk('public')
+            ->directory('photos')
+            ->label('Photo'),
+            // Forms\Components\FileUpload::make('photo')->directory('photos')->label('Photo'),
             Forms\Components\TextInput::make('promotion')->label('Promotion'),
             Forms\Components\DatePicker::make('start_date')->label('Début'),
             Forms\Components\DatePicker::make('end_date')->label('Fin'),
