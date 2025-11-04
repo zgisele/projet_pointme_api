@@ -33,11 +33,11 @@ class UpdateCoachRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:users,email',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
+            // 'email' => 'nullable|email|unique:users,email',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'password' => 'required|min:6',
+            'password' => 'nullable|min:6',
         ];
     }
 }

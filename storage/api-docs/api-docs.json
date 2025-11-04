@@ -268,7 +268,7 @@
                     "Coach"
                 ],
                 "summary": "Modifier le profil du coach",
-                "description": "Permet au coach authentifié de mettre à jour son profil (nom, email, photo, mot de passe).",
+                "description": "Permet au coach authentifié de mettre à jour son profil (nom, photo, mot de passe).",
                 "operationId": "98fe2e88f4b031e898b8f1452922d7bf",
                 "parameters": [
                     {
@@ -296,11 +296,6 @@
                                     "last_name": {
                                         "type": "string",
                                         "example": "Dupont"
-                                    },
-                                    "email": {
-                                        "type": "string",
-                                        "format": "email",
-                                        "example": "jean.dupont@example.com"
                                     },
                                     "photo": {
                                         "description": "Fichier image du profil (jpg, png...)",
@@ -342,10 +337,6 @@
                                                 "last_name": {
                                                     "type": "string",
                                                     "example": "Diop"
-                                                },
-                                                "email": {
-                                                    "type": "string",
-                                                    "example": "fatou.diop@example.com"
                                                 },
                                                 "photo": {
                                                     "type": "string",

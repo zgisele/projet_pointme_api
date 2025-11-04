@@ -338,11 +338,98 @@ class AuthController extends Controller
     }
 
 
+// /**
+//  * @OA\Post(
+//  *     path="/api/update-coach/{id}",
+//  *     summary="Modifier le profil du coach",
+//  *     description="Permet au coach authentifié de mettre à jour son profil (nom, email, photo, mot de passe).",
+//  *     tags={"Coach"},
+//  *     security={{"bearerAuth":{}}},
+//  *
+//  *     @OA\Parameter(
+//  *         name="id",
+//  *         in="path",
+//  *         required=true,
+//  *         description="Identifiant du coach à modifier (doit correspondre à l’utilisateur connecté)",
+//  *         @OA\Schema(type="integer", example=3)
+//  *     ),
+//  *
+//  *     @OA\RequestBody(
+//  *         required=true,
+//  *         description="Données du profil à mettre à jour",
+//  *            @OA\MediaType(
+//  *             mediaType="multipart/form-data",
+//  *             @OA\Schema(
+//  *                 type="object",
+//  *                 @OA\Property(property="first_name", type="string", example="Jean"),
+//  *                 @OA\Property(property="last_name", type="string", example="Dupont"),
+//  *                 @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
+//  *                 @OA\Property(property="photo", type="string", format="binary", description="Fichier image du profil (jpg, png...)"),
+//  *                 @OA\Property(property="password", type="string", format="password", example="nouveauMotDePasse123")
+//  *             )
+//  *         )
+//  *     ),
+//  *
+//  *     @OA\Response(
+//  *         response=200,
+//  *         description="Profil mis à jour avec succès",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Profil mis à jour avec succès"),
+//  *             @OA\Property(
+//  *                 property="user",
+//  *                 type="object",
+//  *                 @OA\Property(property="id", type="integer", example=3),
+//  *                 @OA\Property(property="first_name", type="string", example="Fatou"),
+//  *                 @OA\Property(property="last_name", type="string", example="Diop"),
+//  *                 @OA\Property(property="photo", type="string", example="https://example.com/storage/photos/fatou.jpg")
+//  *             )
+//  *         )
+//  *     ),
+//  *
+//  *     @OA\Response(
+//  *         response=400,
+//  *         description="Erreur de validation des données",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Les champs fournis ne sont pas valides.")
+//  *         )
+//  *     ),
+//  *
+//  *     @OA\Response(
+//  *         response=403,
+//  *         description="Accès non autorisé — l’utilisateur connecté ne correspond pas à l’ID fourni",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Accès non autorisé")
+//  *         )
+//  *     ),
+//  *
+//  *     @OA\Response(
+//  *         response=404,
+//  *         description="Utilisateur non trouvé",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Utilisateur non trouvé")
+//  *         )
+//  *     ),
+//  *
+//  *     @OA\Response(
+//  *         response=401,
+//  *         description="Non authentifié — token JWT invalide ou manquant",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+//  *         )
+//  *     )
+//  * )
+// */
+
 /**
  * @OA\Post(
  *     path="/api/update-coach/{id}",
  *     summary="Modifier le profil du coach",
- *     description="Permet au coach authentifié de mettre à jour son profil (nom, email, photo, mot de passe).",
+ *     description="Permet au coach authentifié de mettre à jour son profil (nom, photo, mot de passe).",
  *     tags={"Coach"},
  *     security={{"bearerAuth":{}}},
  *
@@ -357,13 +444,12 @@ class AuthController extends Controller
  *     @OA\RequestBody(
  *         required=true,
  *         description="Données du profil à mettre à jour",
- *            @OA\MediaType(
+ *         @OA\MediaType(
  *             mediaType="multipart/form-data",
  *             @OA\Schema(
  *                 type="object",
  *                 @OA\Property(property="first_name", type="string", example="Jean"),
  *                 @OA\Property(property="last_name", type="string", example="Dupont"),
- *                 @OA\Property(property="email", type="string", format="email", example="jean.dupont@example.com"),
  *                 @OA\Property(property="photo", type="string", format="binary", description="Fichier image du profil (jpg, png...)"),
  *                 @OA\Property(property="password", type="string", format="password", example="nouveauMotDePasse123")
  *             )
@@ -382,7 +468,6 @@ class AuthController extends Controller
  *                 @OA\Property(property="id", type="integer", example=3),
  *                 @OA\Property(property="first_name", type="string", example="Fatou"),
  *                 @OA\Property(property="last_name", type="string", example="Diop"),
- *                 @OA\Property(property="email", type="string", example="fatou.diop@example.com"),
  *                 @OA\Property(property="photo", type="string", example="https://example.com/storage/photos/fatou.jpg")
  *             )
  *         )
@@ -424,7 +509,8 @@ class AuthController extends Controller
  *         )
  *     )
  * )
-*/
+ */
+
 
 public function updateCoach(UpdateCoachRequest $request, $id)
 {
@@ -479,7 +565,145 @@ public function updateCoach(UpdateCoachRequest $request, $id)
             'id' => $user->id,
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
-            'email' => $user->email,
+            // 'email' => $user->email,
+            'photo' => $user->photo ? asset('storage/' . $user->photo) : null,
+        ]
+    ], 200);
+}
+
+
+
+/**
+ * @OA\Post(
+ *     path="/api/update-coach/{id}",
+ *     summary="Modifier le profil du coach",
+ *     description="Permet au coach authentifié de mettre à jour son profil (nom, photo, mot de passe).",
+ *     tags={"Coach"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="Identifiant du coach à modifier (doit correspondre à l’utilisateur connecté)",
+ *         @OA\Schema(type="integer", example=3)
+ *     ),
+ *
+ *     @OA\RequestBody(
+ *         required=true,
+ *         description="Données du profil à mettre à jour",
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 type="object",
+ *                 @OA\Property(property="first_name", type="string", example="Jean"),
+ *                 @OA\Property(property="last_name", type="string", example="Dupont"),
+ *                 @OA\Property(property="photo", type="string", format="binary", description="Fichier image du profil (jpg, png...)"),
+ *                 @OA\Property(property="password", type="string", format="password", example="nouveauMotDePasse123")
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Profil mis à jour avec succès",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Profil mis à jour avec succès"),
+ *             @OA\Property(
+ *                 property="user",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=3),
+ *                 @OA\Property(property="first_name", type="string", example="Fatou"),
+ *                 @OA\Property(property="last_name", type="string", example="Diop"),
+ *                 @OA\Property(property="photo", type="string", example="https://example.com/storage/photos/fatou.jpg")
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=400,
+ *         description="Erreur de validation des données",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Les champs fournis ne sont pas valides.")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=403,
+ *         description="Accès non autorisé — l’utilisateur connecté ne correspond pas à l’ID fourni",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Accès non autorisé")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Utilisateur non trouvé",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Utilisateur non trouvé")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=401,
+ *         description="Non authentifié — token JWT invalide ou manquant",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+ *         )
+ *     )
+ * )
+ */
+
+
+public function updateStagiaire(updateStagiaire $request, $id)
+{
+    $user = auth()->user();
+
+    // Vérifie que l'utilisateur connecté correspond à l'ID envoyé
+    if ($user->id != $id) {
+        return response()->json(['message' => 'Accès non autorisé'], 403);
+    }
+    // $validated=$request->safe()->all();
+     // ✅ Récupération des données validées depuis la FormRequest
+    $validated = $request->validated();
+
+    // Mise à jour du mot de passe si présent
+    if (!empty($validated['password'])) {
+        $validated['password'] = bcrypt($validated['password']);
+    } else {
+        unset($validated['password']);
+    }
+
+    // Gestion de la photo
+    if ($request->hasFile('photo')) {
+        // Supprime l’ancienne photo si elle existe
+        if ($user->photo && \Storage::exists('public/' . $user->photo)) {
+            \Storage::delete('public/' . $user->photo);
+        }
+
+        // Enregistre la nouvelle photo
+        $path = $request->file('photo')->store('photos', 'public');
+        $validated['photo'] = $path;
+    }
+
+    // Mise à jour de l'utilisateur
+
+
+    $user->update($validated);
+
+    // Retourne la réponse
+    return response()->json([
+        'message' => 'Profil mis à jour avec succès',
+        'user' => [
+            'id' => $user->id,
+            'first_name' => $user->first_name,
+            'last_name' => $user->last_name,
+            // 'email' => $user->email,
             'photo' => $user->photo ? asset('storage/' . $user->photo) : null,
         ]
     ], 200);

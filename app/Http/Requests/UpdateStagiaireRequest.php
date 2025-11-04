@@ -36,9 +36,13 @@ class UpdateStagiaireRequest extends FormRequest
             //
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'email' => 'nullable|email|unique:users,email',
+            // 'email' => 'nullable|email|unique:users,email',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'phone' => 'required|string',
             'password' => 'required|min:6',
+            'promotion'  => 'nullable|string|max:50',
+            'start_date' => 'nullable|date',
+            'end_date'   => 'nullable|date',
         ];
     }
 }
