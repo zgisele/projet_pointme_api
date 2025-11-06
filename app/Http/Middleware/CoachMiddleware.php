@@ -25,7 +25,7 @@ class CoachMiddleware
      */
     public function handle(Request $request, Closure $next): Response
     {
-        // return $next($request);
+        
         try {
             $user=JWTAuth::parseToken()->authenticate();
             //code...

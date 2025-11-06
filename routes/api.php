@@ -68,6 +68,7 @@ Route::middleware(['jwt.auth', 'coache'])->group(function () {
 
 Route::middleware(['jwt.auth', 'stagiaire'])->group(function () {
      Route::get('profileStagiaire', [AuthController::class, 'profileStagiaire']);
+     Route::post('update-stagiaire/{id}', [AuthController::class, 'updateStagiaire']);
     //  Route::post('logoutStagiaire', [AuthController::class, 'logoutStagiaire']);
    // Route::get('/stagiaire/cours', [StagiaireController::class, 'index']);
 });

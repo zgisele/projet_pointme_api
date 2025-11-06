@@ -5,9 +5,10 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Tymon\JWTAuth\Facades\JWTAuth;
+use Tymon\JWTAuth\Facades\JWTAuth;             
 use App\Models\User;
 use App\Http\Requests\UpdateCoachRequest;
+use App\Http\Requests\UpdateStagiaireRequest;
 /**
  * @OA\Info(
  *     version="1.0.0",
@@ -426,7 +427,7 @@ class AuthController extends Controller
 // */
 
 /**
- * @OA\Post(
+ * @OA\post(
  *     path="/api/update-coach/{id}",
  *     summary="Modifier le profil du coach",
  *     description="Permet au coach authentifié de mettre à jour son profil (nom, photo, mot de passe).",
@@ -574,32 +575,34 @@ public function updateCoach(UpdateCoachRequest $request, $id)
 
 
 /**
- * @OA\Post(
- *     path="/api/update-coach/{id}",
- *     summary="Modifier le profil du coach",
- *     description="Permet au coach authentifié de mettre à jour son profil (nom, photo, mot de passe).",
- *     tags={"Coach"},
+ * @OA\post(
+ *     path="/api/update-stagiaire/{id}",
+ *     summary="Mettre à jour le profil du stagiaire",
+ *     description="Permet au stagiaire authentifié de mettre à jour ses informations personnelles (nom, prénom, téléphone, photo, mot de passe, promotion, dates de stage).",
+ *     tags={"Stagiaire"},
  *     security={{"bearerAuth":{}}},
  *
  *     @OA\Parameter(
  *         name="id",
  *         in="path",
  *         required=true,
- *         description="Identifiant du coach à modifier (doit correspondre à l’utilisateur connecté)",
- *         @OA\Schema(type="integer", example=3)
+ *         description="Identifiant du stagiaire à mettre à jour",
+ *         @OA\Schema(type="integer")
  *     ),
  *
  *     @OA\RequestBody(
  *         required=true,
- *         description="Données du profil à mettre à jour",
  *         @OA\MediaType(
  *             mediaType="multipart/form-data",
  *             @OA\Schema(
- *                 type="object",
  *                 @OA\Property(property="first_name", type="string", example="Jean"),
  *                 @OA\Property(property="last_name", type="string", example="Dupont"),
- *                 @OA\Property(property="photo", type="string", format="binary", description="Fichier image du profil (jpg, png...)"),
- *                 @OA\Property(property="password", type="string", format="password", example="nouveauMotDePasse123")
+ *                 @OA\Property(property="phone", type="string", example="+221771234567"),
+ *                 @OA\Property(property="password", type="string", example="motdepasse123"),
+ *                 @OA\Property(property="photo", type="file", description="Nouvelle photo (jpeg, png, jpg, gif)"),
+ *                 @OA\Property(property="promotion", type="string", example="2025A"),
+ *                 @OA\Property(property="start_date", type="string", format="date", example="2025-02-01"),
+ *                 @OA\Property(property="end_date", type="string", format="date", example="2025-08-01")
  *             )
  *         )
  *     ),
@@ -608,59 +611,27 @@ public function updateCoach(UpdateCoachRequest $request, $id)
  *         response=200,
  *         description="Profil mis à jour avec succès",
  *         @OA\JsonContent(
- *             type="object",
  *             @OA\Property(property="message", type="string", example="Profil mis à jour avec succès"),
- *             @OA\Property(
- *                 property="user",
- *                 type="object",
- *                 @OA\Property(property="id", type="integer", example=3),
- *                 @OA\Property(property="first_name", type="string", example="Fatou"),
- *                 @OA\Property(property="last_name", type="string", example="Diop"),
- *                 @OA\Property(property="photo", type="string", example="https://example.com/storage/photos/fatou.jpg")
+ *             @OA\Property(property="user", type="object",
+ *                 @OA\Property(property="id", type="integer", example=1),
+ *                 @OA\Property(property="first_name", type="string", example="Jean"),
+ *                 @OA\Property(property="last_name", type="string", example="Dupont"),
+ *                 @OA\Property(property="promotion", type="string", example="2025A"),
+ *                 @OA\Property(property="start_date", type="string", example="2025-02-01"),
+ *                 @OA\Property(property="end_date", type="string", example="2025-08-01"),
+ *                 @OA\Property(property="photo", type="string", example="http://votre-domaine/storage/photos/abcdef123.jpg")
  *             )
  *         )
  *     ),
- *
- *     @OA\Response(
- *         response=400,
- *         description="Erreur de validation des données",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Les champs fournis ne sont pas valides.")
- *         )
- *     ),
- *
- *     @OA\Response(
- *         response=403,
- *         description="Accès non autorisé — l’utilisateur connecté ne correspond pas à l’ID fourni",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Accès non autorisé")
- *         )
- *     ),
- *
- *     @OA\Response(
- *         response=404,
- *         description="Utilisateur non trouvé",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Utilisateur non trouvé")
- *         )
- *     ),
- *
- *     @OA\Response(
- *         response=401,
- *         description="Non authentifié — token JWT invalide ou manquant",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Unauthenticated.")
- *         )
- *     )
+ *     @OA\Response(response=403, description="Accès non autorisé"),
+ *     @OA\Response(response=422, description="Erreur de validation")
  * )
+ *
+ * @param  \App\Http\Requests\UpdateStagiaireRequest  $request
+ * @param  int  $id,UpdateStagiaireRequest, 
+ * @return \Illuminate\Http\JsonResponse
  */
-
-
-public function updateStagiaire(updateStagiaire $request, $id)
+public function updateStagiaire(UpdateStagiaireRequest $request, $id)
 {
     $user = auth()->user();
 
@@ -668,8 +639,8 @@ public function updateStagiaire(updateStagiaire $request, $id)
     if ($user->id != $id) {
         return response()->json(['message' => 'Accès non autorisé'], 403);
     }
-    // $validated=$request->safe()->all();
-     // ✅ Récupération des données validées depuis la FormRequest
+
+    // ✅ Récupération des données validées
     $validated = $request->validated();
 
     // Mise à jour du mot de passe si présent
@@ -691,9 +662,7 @@ public function updateStagiaire(updateStagiaire $request, $id)
         $validated['photo'] = $path;
     }
 
-    // Mise à jour de l'utilisateur
-
-
+    // ✅ Mise à jour des champs supplémentaires (promotion, dates)
     $user->update($validated);
 
     // Retourne la réponse
@@ -703,9 +672,13 @@ public function updateStagiaire(updateStagiaire $request, $id)
             'id' => $user->id,
             'first_name' => $user->first_name,
             'last_name' => $user->last_name,
-            // 'email' => $user->email,
+            'phone' => $user->phone,
+            'promotion' => $user->promotion,
+            'start_date' => $user->start_date,
+            'end_date' => $user->end_date,
             'photo' => $user->photo ? asset('storage/' . $user->photo) : null,
         ]
     ], 200);
 }
+
 }

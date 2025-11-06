@@ -423,6 +423,135 @@
                 ]
             }
         },
+        "/api/update-stagiaire/{id}": {
+            "post": {
+                "tags": [
+                    "Stagiaire"
+                ],
+                "summary": "Mettre à jour le profil du stagiaire",
+                "description": "Permet au stagiaire authentifié de mettre à jour ses informations personnelles (nom, prénom, téléphone, photo, mot de passe, promotion, dates de stage).",
+                "operationId": "aac21105609b0f1cbbe9be95f593afbb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du stagiaire à mettre à jour",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "example": "Jean"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "Dupont"
+                                    },
+                                    "phone": {
+                                        "type": "string",
+                                        "example": "+221771234567"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "motdepasse123"
+                                    },
+                                    "photo": {
+                                        "description": "Nouvelle photo (jpeg, png, jpg, gif)",
+                                        "type": "file"
+                                    },
+                                    "promotion": {
+                                        "type": "string",
+                                        "example": "2025A"
+                                    },
+                                    "start_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-02-01"
+                                    },
+                                    "end_date": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "2025-08-01"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Profil mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Profil mis à jour avec succès"
+                                        },
+                                        "user": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "first_name": {
+                                                    "type": "string",
+                                                    "example": "Jean"
+                                                },
+                                                "last_name": {
+                                                    "type": "string",
+                                                    "example": "Dupont"
+                                                },
+                                                "promotion": {
+                                                    "type": "string",
+                                                    "example": "2025A"
+                                                },
+                                                "start_date": {
+                                                    "type": "string",
+                                                    "example": "2025-02-01"
+                                                },
+                                                "end_date": {
+                                                    "type": "string",
+                                                    "example": "2025-08-01"
+                                                },
+                                                "photo": {
+                                                    "type": "string",
+                                                    "example": "http://votre-domaine/storage/photos/abcdef123.jpg"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès non autorisé"
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/coaches/{id}/stagiaires": {
             "get": {
                 "tags": [

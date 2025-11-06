@@ -13,7 +13,7 @@ class UpdateStagiaireRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
      public function failedValidation(Validator $validator){
         throw new HttpResponseException(response()->json([
@@ -34,12 +34,12 @@ class UpdateStagiaireRequest extends FormRequest
     {
         return [
             //
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
+            'first_name' => 'nullable|string|max:255',
+            'last_name' => 'nullable|string|max:255',
             // 'email' => 'nullable|email|unique:users,email',
             'photo' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'phone' => 'required|string',
-            'password' => 'required|min:6',
+            'phone' => 'nullable|string',
+            'password' => 'nullable|min:6',
             'promotion'  => 'nullable|string|max:50',
             'start_date' => 'nullable|date',
             'end_date'   => 'nullable|date',
