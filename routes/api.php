@@ -21,6 +21,8 @@ use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\QRTokenController;
+use App\Http\Controllers\PointageController;
 
 Route::post('register/admin', [AuthController::class, 'registerAdmin']);
 // Route::post('register/coache', [AuthController::class, 'registerCoache']);
@@ -51,6 +53,13 @@ Route::middleware(['jwt.auth', 'coache'])->group(function () {
     // Mise  à jour du profil coach
     // Route::put('UpdateCoach/{id}', [AuthController::class, 'UpdateCoach']);
     Route::post('update-coach/{id}', [AuthController::class, 'updateCoach']);
+
+    Route::get('/qr-code', [ QRTokenController::class, 'afficherQrCode']);
+
+    // Route::post('/pointages/scan', [PointageController::class, 'validerScan']);
+
+    Route::post('/qr-tokens', [QRTokenController::class, 'generate']);
+
     // Route::put('coachs/{id}', [Controller::class, 'updateCoach']);
 
     // Visualiser tous les pointages du coach
@@ -69,6 +78,9 @@ Route::middleware(['jwt.auth', 'coache'])->group(function () {
 Route::middleware(['jwt.auth', 'stagiaire'])->group(function () {
      Route::get('profileStagiaire', [AuthController::class, 'profileStagiaire']);
      Route::post('update-stagiaire/{id}', [AuthController::class, 'updateStagiaire']);
+
+     Route::get('/QrCodeStagiaire', [QRTokenController::class, 'afficherQrCodeStagiaire']);
+     Route::post('/pointages/scan', [PointageController::class, 'validerScan']);
     //  Route::post('logoutStagiaire', [AuthController::class, 'logoutStagiaire']);
    // Route::get('/stagiaire/cours', [StagiaireController::class, 'index']);
 });

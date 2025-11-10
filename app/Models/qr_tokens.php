@@ -20,4 +20,11 @@ class qr_tokens extends Model
     {
         return $this->hasMany(Pointage::class);
     }
+
+
+    protected $casts = [
+     'valid_until' => 'datetime',
+];
+
 }
+

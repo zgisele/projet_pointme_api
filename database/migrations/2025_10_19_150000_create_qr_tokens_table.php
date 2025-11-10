@@ -13,7 +13,7 @@ return new class extends Migration
         Schema::create('qr_tokens', function (Blueprint $table) {
             $table->id();
             $table->string('token')->unique();
-            $table->unsignedBigInteger('created_by'); // Coach ou Admin
+            $table->unsignedBigInteger('created_by')->nullable(); // Coach ou Admin
             $table->dateTime('valid_until');
             $table->boolean('is_active')->default(true);
             // $table->foreign('created_by')->references('id')->on('users')->onDelete('cascade');

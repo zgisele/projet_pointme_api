@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Pointage;
 use Illuminate\Support\Facades\Auth;
+use App\Models\qr_tokens;
+use Carbon\Carbon;
      
 class PointageController extends Controller
 {
@@ -36,64 +38,64 @@ class PointageController extends Controller
     // */
 
 
-// /**
-//  * @OA\Get(
-//  *     path="/api/listePointages",
-//  *     summary="Lister les pointages des stagiaires du coach connecté",
-//  *     description="Cet endpoint permet au coach connecté de visualiser tous les pointages de ses stagiaires (présents, absents, en retard).",
-//  *     tags={"Coach"},
-//  *     security={{"bearerAuth":{}}},
-//  *
-//  *     @OA\Response(
-//  *         response=200,
-//  *         description="Liste des pointages récupérée avec succès",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(
-//  *                 property="pointages",
-//  *                 type="array",
-//  *                 @OA\Items(
-//  *                     type="object",
-//  *                     @OA\Property(property="id", type="integer", example=12),
-//  *                     @OA\Property(property="user_id", type="integer", example=7),
-//  *                     @OA\Property(property="coach_id", type="integer", example=3),
-//  *                     @OA\Property(property="statut", type="string", example="présent"),
-//  *                     @OA\Property(property="heure_arrivee", type="string", format="time", example="08:45:00"),
-//  *                     @OA\Property(property="heure_sortie", type="string", format="time", example="17:00:00"),
-//  *                     @OA\Property(property="note", type="string", nullable=true, example="Arrivé légèrement en retard"),
-//  *                     @OA\Property(property="date_pointage", type="string", format="date", example="2025-10-30"),
-//  *                     @OA\Property(
-//  *                         property="stagiaire",
-//  *                         type="object",
-//  *                         @OA\Property(property="id", type="integer", example=7),
-//  *                         @OA\Property(property="first_name", type="string", example="Awa"),
-//  *                         @OA\Property(property="last_name", type="string", example="Diop"),
-//  *                         @OA\Property(property="email", type="string", example="awa.diop@example.com")
-//  *                     )
-//  *                 )
-//  *             )
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=403,
-//  *         description="Accès non autorisé — l’utilisateur n’est pas un coach",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Accès non autorisé")
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=401,
-//  *         description="Non authentifié — le token JWT est manquant ou invalide",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-//  *         )
-//  *     )
-//  * )
-// */
+/**
+ * @OA\Get(
+ *     path="/api/listePointages",
+ *     summary="Lister les pointages des stagiaires du coach connecté",
+ *     description="Cet endpoint permet au coach connecté de visualiser tous les pointages de ses stagiaires (présents, absents, en retard).",
+ *     tags={"Coach"},
+ *     security={{"bearerAuth":{}}},
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Liste des pointages récupérée avec succès",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(
+ *                 property="pointages",
+ *                 type="array",
+ *                 @OA\Items(
+ *                     type="object",
+ *                     @OA\Property(property="id", type="integer", example=12),
+ *                     @OA\Property(property="user_id", type="integer", example=7),
+ *                     @OA\Property(property="coach_id", type="integer", example=3),
+ *                     @OA\Property(property="statut", type="string", example="présent"),
+ *                     @OA\Property(property="heure_arrivee", type="string", format="time", example="08:45:00"),
+ *                     @OA\Property(property="heure_sortie", type="string", format="time", example="17:00:00"),
+ *                     @OA\Property(property="note", type="string", nullable=true, example="Arrivé légèrement en retard"),
+ *                     @OA\Property(property="date_pointage", type="string", format="date", example="2025-10-30"),
+ *                     @OA\Property(
+ *                         property="stagiaire",
+ *                         type="object",
+ *                         @OA\Property(property="id", type="integer", example=7),
+ *                         @OA\Property(property="first_name", type="string", example="Awa"),
+ *                         @OA\Property(property="last_name", type="string", example="Diop"),
+ *                         @OA\Property(property="email", type="string", example="awa.diop@example.com")
+ *                     )
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=403,
+ *         description="Accès non autorisé — l’utilisateur n’est pas un coach",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Accès non autorisé")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=401,
+ *         description="Non authentifié — le token JWT est manquant ou invalide",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+ *         )
+ *     )
+ * )
+*/
 
      // GET /api/pointages
     public function listePointages()
@@ -351,4 +353,103 @@ class PointageController extends Controller
 
         return response()->json(['message' => 'Pointage mis à jour', 'pointage' => $pointage], 200);
     }
+
+
+/**
+ * @OA\Post(
+ *     path="/api/pointages/scan",
+ *     tags={"Stagiaire"},
+ *     summary="Valider le scan d'un QR code et notifier le stagiaire",
+ *     description="Cette méthode permet à un stagiaire de scanner un QR code actif pour enregistrer sa présence. 
+ *                  Elle vérifie que le token est valide et que l'utilisateur n'a pas déjà pointé aujourd'hui.
+ *                  Ensuite, elle enregistre le pointage avec la date et l'heure actuelles et renvoie une notification.",
+ *     security={{"bearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 type="object",
+ *                 required={"token"},
+ *                 @OA\Property(
+ *                     property="token",
+ *                     type="string",
+ *                     description="Le token du QR code fourni par le frontend",
+ *                     example="9j0TnY92tvB7SdUosNPhP5uD3piqfklR"
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Pointage enregistré et notification envoyée",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Pointage enregistré avec succès"),
+ *             @OA\Property(
+ *                 property="notification",
+ *                 type="object",
+ *                 @OA\Property(property="type", type="string", example="info"),
+ *                 @OA\Property(property="content", type="string", example="Votre pointage du 10/11/2025 a été enregistré.")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Token invalide/expiré ou déjà pointé aujourd'hui",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Vous avez déjà pointé aujourd'hui")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=404,
+ *         description="Aucun QR code actif trouvé",
+ *         @OA\JsonContent(
+ *             type="object",
+ *             @OA\Property(property="message", type="string", example="Aucun QR code actif trouvé")
+ *         )
+ *     )
+ * )
+ */
+
+
+
+    public function validerScan(Request $request)
+{
+    // 1️⃣ Vérifier que le token est fourni
+    $request->validate(['token' => 'required|string']);
+
+    // 2️⃣ Rechercher le token en base
+    $qr = qr_tokens::where('token', $request->token)
+                 ->where('is_active', true)
+                 ->first();
+
+    // 3️⃣ Si le token n’existe pas ou est expiré
+    if (!$qr || $qr->valid_until->isPast()) {
+        return response()->json(['message' => 'Token invalide ou expiré'], 400);
+    }
+
+    // 4️⃣ Identifier le stagiaire connecté
+    $stagiaireId = auth()->id(); // ou reçu depuis le frontend
+
+    // 5️⃣ Vérifier s’il a déjà pointé aujourd’hui
+    $dejaPointe = Pointage::where('user_id', $stagiaireId)
+                          ->whereDate('created_at', today())
+                          ->exists();
+
+    if ($dejaPointe) {
+        return response()->json(['message' => 'Vous avez déjà pointé aujourd’hui'], 400);
+    }
+
+    // 6️⃣ Enregistrer le pointage
+    Pointage::create([
+        'user_id' => $stagiaireId,
+        'status' => 'present',
+        'timestamp' => now(),
+        'date_pointage' => today(), 
+    ]);
+
+    return response()->json(['message' => 'Pointage enregistré avec succès']);
+}
 }

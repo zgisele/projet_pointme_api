@@ -770,6 +770,358 @@
                     }
                 ]
             }
+        },
+        "/api/listePointages": {
+            "get": {
+                "tags": [
+                    "Coach"
+                ],
+                "summary": "Lister les pointages des stagiaires du coach connecté",
+                "description": "Cet endpoint permet au coach connecté de visualiser tous les pointages de ses stagiaires (présents, absents, en retard).",
+                "operationId": "742df304e5cf8f5b76de58eb3a923dc0",
+                "responses": {
+                    "200": {
+                        "description": "Liste des pointages récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "pointages": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 12
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer",
+                                                        "example": 7
+                                                    },
+                                                    "coach_id": {
+                                                        "type": "integer",
+                                                        "example": 3
+                                                    },
+                                                    "statut": {
+                                                        "type": "string",
+                                                        "example": "présent"
+                                                    },
+                                                    "heure_arrivee": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "08:45:00"
+                                                    },
+                                                    "heure_sortie": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "17:00:00"
+                                                    },
+                                                    "note": {
+                                                        "type": "string",
+                                                        "example": "Arrivé légèrement en retard",
+                                                        "nullable": true
+                                                    },
+                                                    "date_pointage": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-10-30"
+                                                    },
+                                                    "stagiaire": {
+                                                        "properties": {
+                                                            "id": {
+                                                                "type": "integer",
+                                                                "example": 7
+                                                            },
+                                                            "first_name": {
+                                                                "type": "string",
+                                                                "example": "Awa"
+                                                            },
+                                                            "last_name": {
+                                                                "type": "string",
+                                                                "example": "Diop"
+                                                            },
+                                                            "email": {
+                                                                "type": "string",
+                                                                "example": "awa.diop@example.com"
+                                                            }
+                                                        },
+                                                        "type": "object"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès non autorisé — l’utilisateur n’est pas un coach",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Accès non autorisé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié — le token JWT est manquant ou invalide",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/pointages/scan": {
+            "post": {
+                "tags": [
+                    "Stagiaire"
+                ],
+                "summary": "Valider le scan d'un QR code et notifier le stagiaire",
+                "description": "Cette méthode permet à un stagiaire de scanner un QR code actif pour enregistrer sa présence. \n *                  Elle vérifie que le token est valide et que l'utilisateur n'a pas déjà pointé aujourd'hui.\n *                  Ensuite, elle enregistre le pointage avec la date et l'heure actuelles et renvoie une notification.",
+                "operationId": "2fbd85841c836a632b473e08d5780887",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "token"
+                                ],
+                                "properties": {
+                                    "token": {
+                                        "description": "Le token du QR code fourni par le frontend",
+                                        "type": "string",
+                                        "example": "9j0TnY92tvB7SdUosNPhP5uD3piqfklR"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pointage enregistré et notification envoyée",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pointage enregistré avec succès"
+                                        },
+                                        "notification": {
+                                            "properties": {
+                                                "type": {
+                                                    "type": "string",
+                                                    "example": "info"
+                                                },
+                                                "content": {
+                                                    "type": "string",
+                                                    "example": "Votre pointage du 10/11/2025 a été enregistré."
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Token invalide/expiré ou déjà pointé aujourd'hui",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vous avez déjà pointé aujourd'hui"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun QR code actif trouvé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Aucun QR code actif trouvé"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/qr-tokens": {
+            "post": {
+                "tags": [
+                    "QR Tokens"
+                ],
+                "summary": "Générer un nouveau QR Token",
+                "description": "Permet à un coach ou un administrateur authentifié de générer un QR Token valide jusqu’à une date donnée.",
+                "operationId": "27e3b9f8ad5e3b488adae3210f75a50e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "valid_until"
+                                ],
+                                "properties": {
+                                    "valid_until": {
+                                        "description": "Date d’expiration du QR token (format Y-m-d H:i:s)",
+                                        "type": "string",
+                                        "format": "date-time",
+                                        "example": "2025-11-10 23:59:59"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "QR Token généré avec succès.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "QR Token généré avec succès."
+                                        },
+                                        "data": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "token": {
+                                                    "type": "string",
+                                                    "example": "b4c9f6d7-8e45-43d3-9f89-a45be5fd2a17"
+                                                },
+                                                "created_by": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "valid_until": {
+                                                    "type": "string",
+                                                    "format": "date-time",
+                                                    "example": "2025-11-10 23:59:59"
+                                                },
+                                                "is_active": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "created_at": {
+                                                    "type": "string",
+                                                    "example": "2025-11-06T21:15:00.000000Z"
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-11-06T21:15:00.000000Z"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation.",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "The valid_until field is required."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié (token manquant ou invalide)."
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/qr-code": {
+            "get": {
+                "tags": [
+                    "Coach"
+                ],
+                "summary": "Afficher le QR code actif",
+                "description": "Retourne le QR code actif sous forme d’image SVG à partir du jeton actif enregistré dans la table qr_tokens.",
+                "operationId": "afficherQrCode",
+                "responses": {
+                    "200": {
+                        "description": "QR code généré avec succès (image SVG)",
+                        "content": {
+                            "image/svg+xml": {}
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun QR code actif trouvé"
+                    }
+                }
+            }
         }
     },
     "tags": [
@@ -784,6 +1136,10 @@
         {
             "name": "Stagiaire",
             "description": "Stagiaire"
+        },
+        {
+            "name": "QR Tokens",
+            "description": "QR Tokens"
         }
     ],
     "components": {
