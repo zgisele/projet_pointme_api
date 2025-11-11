@@ -19,7 +19,8 @@ class Kernel extends ConsoleKernel
     {
         // génère un token chaque jour à 00:00 (serveur timezone)
         // ou utiliser ->dailyAt('00:00') pour horaire précis.
-        $schedule->command('generate:qr-token')->dailyAt('00:00');
+        // $schedule->command('generate:qr-token')->dailyAt('00:00');
+        $schedule->command('generate:qr-token')->everyMinute();
     }
 
     /**
