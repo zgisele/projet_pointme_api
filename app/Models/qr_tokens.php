@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class qr_tokens extends Model
 {
@@ -23,8 +24,22 @@ class qr_tokens extends Model
 
 
     protected $casts = [
+     'is_active' => 'boolean',
      'valid_until' => 'datetime',
-];
+    ];
+
+
+
+    public function scopeActive($query)
+    {
+        return $query->where('is_active', true)
+                     ->where('valid_until', '>=', now());
+    }
+
+    public function isExpired(): bool
+    {
+        return $this->valid_until === null || $this->valid_until->lt(now());
+    }
 
 }
 

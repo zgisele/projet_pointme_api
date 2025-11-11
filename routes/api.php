@@ -81,6 +81,7 @@ Route::middleware(['jwt.auth', 'stagiaire'])->group(function () {
 
      Route::get('/QrCodeStagiaire', [QRTokenController::class, 'afficherQrCodeStagiaire']);
      Route::post('/pointages/scan', [PointageController::class, 'validerScan']);
+     Route::post('/pointages/scanQr', [PointageController::class, 'scanQr']);
     //  Route::post('logoutStagiaire', [AuthController::class, 'logoutStagiaire']);
    // Route::get('/stagiaire/cours', [StagiaireController::class, 'index']);
 });

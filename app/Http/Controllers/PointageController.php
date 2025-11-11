@@ -7,7 +7,8 @@ use App\Models\Pointage;
 use Illuminate\Support\Facades\Auth;
 use App\Models\qr_tokens;
 use Carbon\Carbon;
-     
+    
+
 class PointageController extends Controller
 {
     //
@@ -355,63 +356,63 @@ class PointageController extends Controller
     }
 
 
-/**
- * @OA\Post(
- *     path="/api/pointages/scan",
- *     tags={"Stagiaire"},
- *     summary="Valider le scan d'un QR code et notifier le stagiaire",
- *     description="Cette méthode permet à un stagiaire de scanner un QR code actif pour enregistrer sa présence. 
- *                  Elle vérifie que le token est valide et que l'utilisateur n'a pas déjà pointé aujourd'hui.
- *                  Ensuite, elle enregistre le pointage avec la date et l'heure actuelles et renvoie une notification.",
- *     security={{"bearerAuth":{}}},
- *     @OA\RequestBody(
- *         required=true,
- *         @OA\MediaType(
- *             mediaType="multipart/form-data",
- *             @OA\Schema(
- *                 type="object",
- *                 required={"token"},
- *                 @OA\Property(
- *                     property="token",
- *                     type="string",
- *                     description="Le token du QR code fourni par le frontend",
- *                     example="9j0TnY92tvB7SdUosNPhP5uD3piqfklR"
- *                 )
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=200,
- *         description="Pointage enregistré et notification envoyée",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Pointage enregistré avec succès"),
- *             @OA\Property(
- *                 property="notification",
- *                 type="object",
- *                 @OA\Property(property="type", type="string", example="info"),
- *                 @OA\Property(property="content", type="string", example="Votre pointage du 10/11/2025 a été enregistré.")
- *             )
- *         )
- *     ),
- *     @OA\Response(
- *         response=400,
- *         description="Token invalide/expiré ou déjà pointé aujourd'hui",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Vous avez déjà pointé aujourd'hui")
- *         )
- *     ),
- *     @OA\Response(
- *         response=404,
- *         description="Aucun QR code actif trouvé",
- *         @OA\JsonContent(
- *             type="object",
- *             @OA\Property(property="message", type="string", example="Aucun QR code actif trouvé")
- *         )
- *     )
- * )
- */
+// /**
+//  * @OA\Post(
+//  *     path="/api/pointages/scan",
+//  *     tags={"Stagiaire"},
+//  *     summary="Valider le scan d'un QR code et notifier le stagiaire",
+//  *     description="Cette méthode permet à un stagiaire de scanner un QR code actif pour enregistrer sa présence. 
+//  *                  Elle vérifie que le token est valide et que l'utilisateur n'a pas déjà pointé aujourd'hui.
+//  *                  Ensuite, elle enregistre le pointage avec la date et l'heure actuelles et renvoie une notification.",
+//  *     security={{"bearerAuth":{}}},
+//  *     @OA\RequestBody(
+//  *         required=true,
+//  *         @OA\MediaType(
+//  *             mediaType="multipart/form-data",
+//  *             @OA\Schema(
+//  *                 type="object",
+//  *                 required={"token"},
+//  *                 @OA\Property(
+//  *                     property="token",
+//  *                     type="string",
+//  *                     description="Le token du QR code fourni par le frontend",
+//  *                     example="9j0TnY92tvB7SdUosNPhP5uD3piqfklR"
+//  *                 )
+//  *             )
+//  *         )
+//  *     ),
+//  *     @OA\Response(
+//  *         response=200,
+//  *         description="Pointage enregistré et notification envoyée",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Pointage enregistré avec succès"),
+//  *             @OA\Property(
+//  *                 property="notification",
+//  *                 type="object",
+//  *                 @OA\Property(property="type", type="string", example="info"),
+//  *                 @OA\Property(property="content", type="string", example="Votre pointage du 10/11/2025 a été enregistré.")
+//  *             )
+//  *         )
+//  *     ),
+//  *     @OA\Response(
+//  *         response=400,
+//  *         description="Token invalide/expiré ou déjà pointé aujourd'hui",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Vous avez déjà pointé aujourd'hui")
+//  *         )
+//  *     ),
+//  *     @OA\Response(
+//  *         response=404,
+//  *         description="Aucun QR code actif trouvé",
+//  *         @OA\JsonContent(
+//  *             type="object",
+//  *             @OA\Property(property="message", type="string", example="Aucun QR code actif trouvé")
+//  *         )
+//  *     )
+//  * )
+// */
 
 
 
@@ -452,4 +453,126 @@ class PointageController extends Controller
 
     return response()->json(['message' => 'Pointage enregistré avec succès']);
 }
+
+
+
+
+/**
+ * @OA\Post(
+ *     path="/api/pointages/scanQr",
+ *     summary="Scanner un QR code pour enregistrer le pointage",
+ *     description="Permet au stagiaire de scanner un QR code pour enregistrer automatiquement son pointage.
+ *                  - Premier scan : enregistre l'heure d'arrivée et le statut (present/retard).
+ *                  - Deuxième scan : enregistre l'heure de sortie.
+ *                  - Si déjà complet : renvoie un message indiquant que le pointage est terminé.",
+ *     operationId="scanQrCode",
+ *     tags={"Stagiaire"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\RequestBody(
+ *         required=true,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 required={"token"},
+ *                 @OA\Property(
+ *                     property="token",
+ *                     type="string",
+ *                     description="Le token contenu dans le QR code scanné",
+ *                     example="A1B2C3D4E5F6"
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=201,
+ *         description="Pointage d’entrée ou sortie enregistré avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Pointage d’entrée enregistré automatiquement ✅"),
+ *             @OA\Property(property="statut", type="string", nullable=true, example="present"),
+ *             @OA\Property(property="heure_arrivee", type="string", nullable=true, example="08:55"),
+ *             @OA\Property(property="heure_sortie", type="string", nullable=true, example="17:00")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="QR code invalide ou expiré",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="QR code invalide ou expiré")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=409,
+ *         description="Le stagiaire a déjà effectué son pointage complet",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Tu as déjà effectué ton pointage complet pour aujourd’hui ✅")
+ *         )
+ *     )
+ * )
+*/
+
+public function scanQr(Request $request)
+{
+
+    // Vérifie que le token du QR code est présent
+    $request->validate([
+            'token' => 'required|string',
+        ]);
+
+    // Recherche du QR code actif correspondant
+        $qr = qr_tokens::where('token', $request->token)
+            ->where('is_active', true)
+            ->where('valid_until', '>=', now())
+            ->first();
+
+        if (!$qr) {
+        return response()->json(['message' => 'QR code invalide ou expiré'], 400);
+        }
+
+    // 2️⃣ Trouver le stagiaire connecté
+        $user = auth()->user();
+
+    // Vérifie s’il a déjà un pointage aujourd’hui
+        $pointage = Pointage::where('user_id', $user->id)
+            ->whereDate('date_pointage', now()->toDateString())
+            ->first();
+
+        $heureActuelle = Carbon::now()->format('H:i');
+        $heureLimite = '08:30'; // Heure limite pour être à l'heure
+
+        // 👉 Si aucun pointage aujourd’hui → c’est l’entrée
+        if (!$pointage) {
+            $statut = $heureActuelle > $heureLimite ? 'retard' : 'present';
+
+            $pointage = Pointage::create([
+                'user_id' => $user->id,
+                'qr_token_id' => $qr->id,
+                'date_pointage' => now()->toDateString(),
+                'heure_arrivee' => $heureActuelle,
+                'statut' => $statut,
+            ]);
+
+            return response()->json([
+                'message' => 'Pointage d’entrée enregistré ✅',
+                'statut' => $statut,
+                'heure_arrivee' => $heureActuelle,
+            ]);
+        }
+        // 👉 Si l’entrée existe mais pas la sortie → on enregistre la sortie
+        if (is_null($pointage->heure_sortie)) {
+            $pointage->update([
+                'heure_sortie' => $heureActuelle,
+            ]);
+
+            return response()->json([
+                'message' => 'Heure de sortie enregistrée automatiquement ✅',
+                'heure_sortie' => $heureActuelle,
+            ]);
+        }
+
+        // 👉 Si les deux sont déjà enregistrés
+        return response()->json([
+            'message' => 'Tu as déjà effectué ton pointage complet pour aujourd’hui ✅',
+        ]);
+}
+
 }

@@ -24,53 +24,53 @@ class QRTokenController extends Controller
      */
 
 
-    /**
-     * @OA\Post(
-     *     path="/api/qr-tokens",
-     *     summary="Générer un nouveau QR Token",
-     *     description="Permet à un coach ou un administrateur authentifié de générer un QR Token valide jusqu’à une date donnée.",
-     *     tags={"QR Tokens"},
-     *     security={{"bearerAuth":{}}},
-     *
-     *     @OA\RequestBody(
-     *         required=true,
-     *         @OA\JsonContent(
-     *             required={"valid_until"},
-     *             @OA\Property(property="valid_until", type="string", format="date-time", example="2025-11-10 23:59:59", description="Date d’expiration du QR token (format Y-m-d H:i:s)")
-     *         )
-     *     ),
-     *
-     *     @OA\Response(
-     *         response=201,
-     *         description="QR Token généré avec succès.",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="QR Token généré avec succès."),
-     *             @OA\Property(
-     *                 property="data",
-     *                 type="object",
-     *                 @OA\Property(property="id", type="integer", example=1),
-     *                 @OA\Property(property="token", type="string", example="b4c9f6d7-8e45-43d3-9f89-a45be5fd2a17"),
-     *                 @OA\Property(property="created_by", type="integer", example=3),
-     *                 @OA\Property(property="valid_until", type="string", format="date-time", example="2025-11-10 23:59:59"),
-     *                 @OA\Property(property="is_active", type="boolean", example=true),
-     *                 @OA\Property(property="created_at", type="string", example="2025-11-06T21:15:00.000000Z"),
-     *                 @OA\Property(property="updated_at", type="string", example="2025-11-06T21:15:00.000000Z")
-     *             )
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=422,
-     *         description="Erreur de validation.",
-     *         @OA\JsonContent(
-     *             @OA\Property(property="message", type="string", example="The valid_until field is required.")
-     *         )
-     *     ),
-     *     @OA\Response(
-     *         response=401,
-     *         description="Non authentifié (token manquant ou invalide)."
-     *     )
-     * )
-     */
+    // /**
+    //  * @OA\Post(
+    //  *     path="/api/qr-tokens",
+    //  *     summary="Générer un nouveau QR Token",
+    //  *     description="Permet à un coach ou un administrateur authentifié de générer un QR Token valide jusqu’à une date donnée.",
+    //  *     tags={"QR Tokens"},
+    //  *     security={{"bearerAuth":{}}},
+    //  *
+    //  *     @OA\RequestBody(
+    //  *         required=true,
+    //  *         @OA\JsonContent(
+    //  *             required={"valid_until"},
+    //  *             @OA\Property(property="valid_until", type="string", format="date-time", example="2025-11-10 23:59:59", description="Date d’expiration du QR token (format Y-m-d H:i:s)")
+    //  *         )
+    //  *     ),
+    //  *
+    //  *     @OA\Response(
+    //  *         response=201,
+    //  *         description="QR Token généré avec succès.",
+    //  *         @OA\JsonContent(
+    //  *             @OA\Property(property="message", type="string", example="QR Token généré avec succès."),
+    //  *             @OA\Property(
+    //  *                 property="data",
+    //  *                 type="object",
+    //  *                 @OA\Property(property="id", type="integer", example=1),
+    //  *                 @OA\Property(property="token", type="string", example="b4c9f6d7-8e45-43d3-9f89-a45be5fd2a17"),
+    //  *                 @OA\Property(property="created_by", type="integer", example=3),
+    //  *                 @OA\Property(property="valid_until", type="string", format="date-time", example="2025-11-10 23:59:59"),
+    //  *                 @OA\Property(property="is_active", type="boolean", example=true),
+    //  *                 @OA\Property(property="created_at", type="string", example="2025-11-06T21:15:00.000000Z"),
+    //  *                 @OA\Property(property="updated_at", type="string", example="2025-11-06T21:15:00.000000Z")
+    //  *             )
+    //  *         )
+    //  *     ),
+    //  *     @OA\Response(
+    //  *         response=422,
+    //  *         description="Erreur de validation.",
+    //  *         @OA\JsonContent(
+    //  *             @OA\Property(property="message", type="string", example="The valid_until field is required.")
+    //  *         )
+    //  *     ),
+    //  *     @OA\Response(
+    //  *         response=401,
+    //  *         description="Non authentifié (token manquant ou invalide)."
+    //  *     )
+    //  * )
+    // */
     public function generate(Request $request)
     {
             // ✅ Validation des données
@@ -153,12 +153,29 @@ class QRTokenController extends Controller
  *     )
  * )
 */
+    // public function afficherQrCode()
+    // {
+    //     $qr = qr_tokens::where('is_active', true)->firstOrFail();
+
+    //     return response( QrCode::size(250)->generate($qr->token))
+    //         ->header('Content-Type', 'image/svg+xml');
+    // }
+
     public function afficherQrCode()
     {
-        $qr = qr_tokens::where('is_active', true)->firstOrFail();
+        // Récupère le token actif (non expiré)
+        $qr = qr_tokens::where('is_active', true)
+                     ->where('valid_until', '>=', now())
+                     ->latest('created_at')
+                     ->first();
 
-        return response( QrCode::size(250)->generate($qr->token))
-            ->header('Content-Type', 'image/svg+xml');
+        if (! $qr) {
+            return response()->json(['message' => 'Aucun QR actif'], 404);
+        }
+
+        $svg = QrCode::size(250)->generate($qr->token);
+
+        return response($svg, 200)->header('Content-Type', 'image/svg+xml');
     }
 
     // Redémarre Apache / PHP-FPM.
@@ -231,33 +248,33 @@ class QRTokenController extends Controller
 //     ]);
 // }
 
-public function afficherQrCodeStagiaire()
-{
-    $stagiaire = auth()->user();
+// public function afficherQrCodeStagiaire()
+// {
+//     $stagiaire = auth()->user();
 
-    if ($stagiaire->role !== 'stagiaire') {
-        return response()->json(['message' => 'Accès non autorisé'], 403);
-    }
+//     if ($stagiaire->role !== 'stagiaire') {
+//         return response()->json(['message' => 'Accès non autorisé'], 403);
+//     }
 
-    // Récupérer le coach associé
-    $coach = $stagiaire->coachs()->first();
+//     // Récupérer le coach associé
+//     $coach = $stagiaire->coachs()->first();
 
-    if (!$coach) {
-        return response()->json(['message' => 'Aucun coach associé'], 404);
-    }
+//     if (!$coach) {
+//         return response()->json(['message' => 'Aucun coach associé'], 404);
+//     }
 
-    // Récupérer le QR actif du coach
-    $qr = coach_stagiaire::where('coach_id', $coach->id)
-                 ->where('is_active', true)
-                 ->first();
+//     // Récupérer le QR actif du coach
+//     $qr = coach_stagiaire::where('coach_id', $coach->id)
+//                  ->where('is_active', true)
+//                  ->first();
 
-    if (!$qr) {
-        return response()->json(['message' => 'Aucun QR code actif'], 404);
-    }
+//     if (!$qr) {
+//         return response()->json(['message' => 'Aucun QR code actif'], 404);
+//     }
 
-    return response(QrCode::size(250)->generate($qr->token))
-        ->header('Content-Type', 'image/svg+xml');
-}
+//     return response(QrCode::size(250)->generate($qr->token))
+//         ->header('Content-Type', 'image/svg+xml');
+// }
 
 
 

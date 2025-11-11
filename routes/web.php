@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Artisan;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,4 +15,9 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect ('/admin/login');
+});
+
+Route::get('/schedule/run', function () {
+    Artisan::call('schedule:run');
+    return response()->json(['message' => 'Scheduler executed']);
 });

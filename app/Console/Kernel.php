@@ -10,10 +10,16 @@ class Kernel extends ConsoleKernel
     /**
      * Define the application's command schedule.
      */
-    protected function schedule(Schedule $schedule): void
+    // protected function schedule(Schedule $schedule): void
+    // {
+    //     // $schedule->command('inspire')->hourly();
+    //      $schedule->command('qr:generate-daily')->dailyAt('00:00');
+    // }
+    protected function schedule(Schedule $schedule)
     {
-        // $schedule->command('inspire')->hourly();
-         $schedule->command('qr:generate-daily')->dailyAt('00:00');
+        // génère un token chaque jour à 00:00 (serveur timezone)
+        // ou utiliser ->dailyAt('00:00') pour horaire précis.
+        $schedule->command('generate:qr-token')->dailyAt('00:00');
     }
 
     /**
