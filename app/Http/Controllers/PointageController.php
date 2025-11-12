@@ -114,6 +114,140 @@ class PointageController extends Controller
         return response()->json(['pointages' => $pointages], 200);
     }
 
+
+/**
+     * Retourne l'historique des présences, retards et absences du stagiaire connecté.
+     */
+
+/**
+     * @OA\Post(
+     *     path="/api/stagiaire/historique",
+     *     summary="Consulter l'historique des présences, retards et absences du stagiaire connecté",
+     *     description="Permet au stagiaire authentifié de récupérer son historique de pointages. 
+     *                  Possibilité de filtrer par une date précise ou par une période. 
+     *                  Si aucun filtre n'est fourni, tout l'historique est renvoyé.",
+     *     tags={"Stagiaire"},
+     *     security={{"bearerAuth": {}}},
+     *
+     *     @OA\RequestBody(
+     *         required=false,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 type="object",
+     *                 @OA\Property(
+     *                     property="date",
+     *                     type="string",
+     *                     format="date",
+     *                     description="Filtrer par date précise (optionnel)"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="debut",
+     *                     type="string",
+     *                     format="date",
+     *                     description="Date de début pour filtrer une période (optionnel)"
+     *                 ),
+     *                 @OA\Property(
+     *                     property="fin",
+     *                     type="string",
+     *                     format="date",
+     *                     description="Date de fin pour filtrer une période (optionnel)"
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=200,
+     *         description="Historique récupéré avec succès",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Historique récupéré avec succès"),
+     *             @OA\Property(
+     *                 property="data",
+     *                 type="array",
+     *                 @OA\Items(
+     *                     type="object",
+     *                     @OA\Property(property="date_pointage", type="string", format="date", example="2025-11-12"),
+     *                     @OA\Property(property="statut", type="string", example="Présent"),
+     *                     @OA\Property(property="heure_arrivee", type="string", format="time", example="08:00:00"),
+     *                     @OA\Property(property="heure_sortie", type="string", format="time", example="17:00:00"),
+     *                     @OA\Property(property="note", type="string", example="Aucun retard")
+     *                 )
+     *             )
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=401,
+     *         description="Utilisateur non authentifié",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="message", type="string", example="Unauthenticated.")
+     *         )
+     *     ),
+     *
+     *     @OA\Response(
+     *         response=500,
+     *         description="Erreur interne du serveur",
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Erreur interne du serveur.")
+     *         )
+     *     )
+     * )
+*/
+    public function historique(Request $request)
+    {
+        try {
+            $stagiaireId = Auth::id(); // ID du stagiaire connecté
+
+            $query = Pointage::where('user_id', $stagiaireId);
+
+            // Filtre par date précise
+            if ($request->filled('date')) {
+                $query->whereDate('date_pointage', $request->date);
+            }
+
+            // Filtre par période
+            if ($request->filled('debut') && $request->filled('fin')) {
+                $query->whereBetween('date_pointage', [$request->debut, $request->fin]);
+            }
+
+            // Récupération triée par date_pointage décroissante
+            $historique = $query->orderBy('date_pointage', 'desc')
+                ->get(['statut', 'heure_arrivee', 'heure_sortie', 'note', 'date_pointage']);
+
+            // Si aucun pointage trouvé
+            if ($historique->isEmpty()) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Aucun pointage trouvé pour le filtre sélectionné.',
+                    'data' => []
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Historique récupéré avec succès',
+                'data' => $historique
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Erreur interne du serveur.',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+
+
+
+
+
     // /**
     //  * Liste les pointages d'une journée spécifique
     //  *
@@ -416,43 +550,43 @@ class PointageController extends Controller
 
 
 
-    public function validerScan(Request $request)
-{
-    // 1️⃣ Vérifier que le token est fourni
-    $request->validate(['token' => 'required|string']);
+//     public function validerScan(Request $request)
+// {
+//     // 1️⃣ Vérifier que le token est fourni
+//     $request->validate(['token' => 'required|string']);
 
-    // 2️⃣ Rechercher le token en base
-    $qr = qr_tokens::where('token', $request->token)
-                 ->where('is_active', true)
-                 ->first();
+//     // 2️⃣ Rechercher le token en base
+//     $qr = qr_tokens::where('token', $request->token)
+//                  ->where('is_active', true)
+//                  ->first();
 
-    // 3️⃣ Si le token n’existe pas ou est expiré
-    if (!$qr || $qr->valid_until->isPast()) {
-        return response()->json(['message' => 'Token invalide ou expiré'], 400);
-    }
+//     // 3️⃣ Si le token n’existe pas ou est expiré
+//     if (!$qr || $qr->valid_until->isPast()) {
+//         return response()->json(['message' => 'Token invalide ou expiré'], 400);
+//     }
 
-    // 4️⃣ Identifier le stagiaire connecté
-    $stagiaireId = auth()->id(); // ou reçu depuis le frontend
+//     // 4️⃣ Identifier le stagiaire connecté
+//     $stagiaireId = auth()->id(); // ou reçu depuis le frontend
 
-    // 5️⃣ Vérifier s’il a déjà pointé aujourd’hui
-    $dejaPointe = Pointage::where('user_id', $stagiaireId)
-                          ->whereDate('created_at', today())
-                          ->exists();
+//     // 5️⃣ Vérifier s’il a déjà pointé aujourd’hui
+//     $dejaPointe = Pointage::where('user_id', $stagiaireId)
+//                           ->whereDate('created_at', today())
+//                           ->exists();
 
-    if ($dejaPointe) {
-        return response()->json(['message' => 'Vous avez déjà pointé aujourd’hui'], 400);
-    }
+//     if ($dejaPointe) {
+//         return response()->json(['message' => 'Vous avez déjà pointé aujourd’hui'], 400);
+//     }
 
-    // 6️⃣ Enregistrer le pointage
-    Pointage::create([
-        'user_id' => $stagiaireId,
-        'status' => 'present',
-        'timestamp' => now(),
-        'date_pointage' => today(), 
-    ]);
+//     // 6️⃣ Enregistrer le pointage
+//     Pointage::create([
+//         'user_id' => $stagiaireId,
+//         'status' => 'present',
+//         'timestamp' => now(),
+//         'date_pointage' => today(), 
+//     ]);
 
-    return response()->json(['message' => 'Pointage enregistré avec succès']);
-}
+//     return response()->json(['message' => 'Pointage enregistré avec succès']);
+// }
 
 
 

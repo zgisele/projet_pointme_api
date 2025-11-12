@@ -897,6 +897,137 @@
                 ]
             }
         },
+        "/api/stagiaire/historique": {
+            "post": {
+                "tags": [
+                    "Stagiaire"
+                ],
+                "summary": "Consulter l'historique des présences, retards et absences du stagiaire connecté",
+                "description": "Permet au stagiaire authentifié de récupérer son historique de pointages. \n     *                  Possibilité de filtrer par une date précise ou par une période. \n     *                  Si aucun filtre n'est fourni, tout l'historique est renvoyé.",
+                "operationId": "3999478dee3653caafc1f5e99627e021",
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "date": {
+                                        "description": "Filtrer par date précise (optionnel)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "debut": {
+                                        "description": "Date de début pour filtrer une période (optionnel)",
+                                        "type": "string",
+                                        "format": "date"
+                                    },
+                                    "fin": {
+                                        "description": "Date de fin pour filtrer une période (optionnel)",
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Historique récupéré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Historique récupéré avec succès"
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "date_pointage": {
+                                                        "type": "string",
+                                                        "format": "date",
+                                                        "example": "2025-11-12"
+                                                    },
+                                                    "statut": {
+                                                        "type": "string",
+                                                        "example": "Présent"
+                                                    },
+                                                    "heure_arrivee": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "08:00:00"
+                                                    },
+                                                    "heure_sortie": {
+                                                        "type": "string",
+                                                        "format": "time",
+                                                        "example": "17:00:00"
+                                                    },
+                                                    "note": {
+                                                        "type": "string",
+                                                        "example": "Aucun retard"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Utilisateur non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Unauthenticated."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Erreur interne du serveur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": false
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Erreur interne du serveur."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/pointages/scanQr": {
             "post": {
                 "tags": [
