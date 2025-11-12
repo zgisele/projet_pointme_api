@@ -19,5 +19,6 @@ Route::get('/', function () {
 
 Route::get('/schedule/run', function () {
     Artisan::call('schedule:run');
+    Log::info('🔁 Schedule exécuté via HTTP à ' . now());
     return response()->json(['message' => 'Scheduler executed']);
 });
