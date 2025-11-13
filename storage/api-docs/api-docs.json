@@ -1028,6 +1028,114 @@
                 ]
             }
         },
+        "/api/coach/stagiaires/presences": {
+            "get": {
+                "tags": [
+                    "Coach"
+                ],
+                "summary": "Consulter les présences des stagiaires d'un coach pour une journée donnée",
+                "description": "Permet au coach connecté de consulter les présences, retards et absences de ses stagiaires pour une journée spécifique.",
+                "operationId": "getStagiairesPresences",
+                "parameters": [
+                    {
+                        "name": "date",
+                        "in": "query",
+                        "description": "Date à consulter au format YYYY-MM-DD",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "format": "date",
+                            "example": "2025-11-11"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des pointages pour les stagiaires du coach",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "properties": {
+                                            "user_id": {
+                                                "type": "integer",
+                                                "example": 5
+                                            },
+                                            "nom": {
+                                                "type": "string",
+                                                "example": "Doe"
+                                            },
+                                            "prenom": {
+                                                "type": "string",
+                                                "example": "John"
+                                            },
+                                            "statut": {
+                                                "type": "string",
+                                                "example": "present"
+                                            },
+                                            "heure_arrivee": {
+                                                "type": "string",
+                                                "example": "08:30",
+                                                "nullable": true
+                                            },
+                                            "heure_sortie": {
+                                                "type": "string",
+                                                "example": "17:00",
+                                                "nullable": true
+                                            },
+                                            "note": {
+                                                "type": "string",
+                                                "example": "Pointage automatique via QR code",
+                                                "nullable": true
+                                            }
+                                        },
+                                        "type": "object"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Date non fournie ou invalide",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "La date est requise et doit être au format YYYY-MM-DD"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Non authentifié"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/pointages/scanQr": {
             "post": {
                 "tags": [

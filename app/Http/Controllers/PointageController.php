@@ -245,6 +245,179 @@ class PointageController extends Controller
     }
 
 
+/**
+ * @OA\Get(
+ *     path="/api/coach/stagiaires/presences",
+ *     summary="Consulter les présences des stagiaires d'un coach pour une journée donnée",
+ *     description="Permet au coach de consulter toutes les présences, retards et absences de ses stagiaires pour une journée spécifique.",
+ *     operationId="getStagiairesPresences",
+ *     tags={"Coach"},
+ *     security={{"bearerAuth":{}}},
+ *     @OA\Parameter(
+ *         name="date",
+ *         in="query",
+ *         required=true,
+ *         description="Date à consulter au format YYYY-MM-DD",
+ *         @OA\Schema(type="string", format="date", example="2025-11-11")
+ *     ),
+ *     @OA\Response(
+ *         response=200,
+ *         description="Liste des pointages pour les stagiaires du coach",
+ *         @OA\JsonContent(
+ *             type="array",
+ *             @OA\Items(
+ *                 @OA\Property(property="user_id", type="integer", example=1),
+ *                 @OA\Property(property="nom", type="string", example="Doe"),
+ *                 @OA\Property(property="prenom", type="string", example="John"),
+ *                 @OA\Property(property="statut", type="string", example="present"),
+ *                 @OA\Property(property="heure_arrivee", type="string", nullable=true, example="08:55"),
+ *                 @OA\Property(property="heure_sortie", type="string", nullable=true, example="17:00"),
+ *                 @OA\Property(property="note", type="string", nullable=true, example="Pointage automatique via QR code")
+ *             )
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=400,
+ *         description="Date non fournie ou invalide",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="La date est requise et doit être au format YYYY-MM-DD")
+ *         )
+ *     ),
+ *     @OA\Response(
+ *         response=401,
+ *         description="Non authentifié",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Non authentifié")
+ *         )
+ *     )
+ * )
+*/
+
+// public function getStagiairesPresences(Request $request)
+// {
+//     $request->validate([
+//         'date' => 'required|date_format:Y-m-d',
+//     ]);
+
+//     $date = $request->date;
+//     $coach = auth()->user();
+
+//     // Récupère les stagiaires via la relation pivot
+//     $stagiaires = $coach->stagiaires()->get();
+
+//     $result = $stagiaires->map(function($stagiaire) use ($date) {
+//         $pointage = Pointage::where('user_id', $stagiaire->id)
+//             ->whereDate('date_pointage', $date)
+//             ->first();
+
+//         return [
+//             'user_id' => $stagiaire->id,
+//             'nom' => $stagiaire->last_name,
+//             'prenom' => $stagiaire->first_name,
+//             'statut' => $pointage ? $pointage->statut : 'absent',
+//             'heure_arrivee' => $pointage ? $pointage->heure_arrivee : null,
+//             'heure_sortie' => $pointage ? $pointage->heure_sortie : null,
+//             'note' => $pointage ? $pointage->note : null,
+//         ];
+//     });
+
+//     return response()->json($result);
+// }
+
+
+
+// /**
+//      * @OA\Get(
+//      *     path="/api/coach/stagiaires/presences",
+//      *     summary="Consulter les présences des stagiaires d'un coach pour une journée donnée",
+//      *     description="Permet au coach connecté de consulter les présences, retards et absences de ses stagiaires pour une journée spécifique.",
+//      *     operationId="getStagiairesPresences",
+//      *     tags={"Coach"},
+//      *     security={{"bearerAuth":{}}},
+//      *     @OA\Parameter(
+//      *         name="date",
+//      *         in="query",
+//      *         required=true,
+//      *         description="Date à consulter au format YYYY-MM-DD",
+//      *         @OA\Schema(type="string", format="date", example="2025-11-11")
+//      *     ),
+//      *     @OA\Response(
+//      *         response=200,
+//      *         description="Liste des pointages pour les stagiaires du coach",
+//      *         @OA\JsonContent(
+//      *             type="array",
+//      *             @OA\Items(
+//      *                 @OA\Property(property="user_id", type="integer", example=5),
+//      *                 @OA\Property(property="nom", type="string", example="Doe"),
+//      *                 @OA\Property(property="prenom", type="string", example="John"),
+//      *                 @OA\Property(property="statut", type="string", example="present"),
+//      *                 @OA\Property(property="heure_arrivee", type="string", nullable=true, example="08:30"),
+//      *                 @OA\Property(property="heure_sortie", type="string", nullable=true, example="17:00"),
+//      *                 @OA\Property(property="note", type="string", nullable=true, example="Pointage automatique via QR code")
+//      *             )
+//      *         )
+//      *     ),
+//      *     @OA\Response(
+//      *         response=400,
+//      *         description="Date non fournie ou invalide",
+//      *         @OA\JsonContent(
+//      *             @OA\Property(property="message", type="string", example="La date est requise et doit être au format YYYY-MM-DD")
+//      *         )
+//      *     ),
+//      *     @OA\Response(
+//      *         response=401,
+//      *         description="Non authentifié",
+//      *         @OA\JsonContent(
+//      *             @OA\Property(property="message", type="string", example="Non authentifié")
+//      *         )
+//      *     )
+//      * )
+// */
+//     public function getStagiairesPresences(Request $request)
+//     {
+//         $request->validate([
+//             'date' => 'required|date_format:Y-m-d',
+//         ]);
+
+//         $date = $request->date;
+//         $coach = auth()->user();
+
+//         // Vérifie que l'utilisateur connecté est bien un coach
+//         if ($coach->role !== 'coache') {
+//             return response()->json(['message' => 'Accès réservé aux coachs uniquement'], 403);
+//         }
+
+//         // ✅ Récupère les stagiaires attribués à ce coach via la table pivot
+//         $stagiaires = $coach->stagiaires()->pluck('users.id')->toArray();
+
+//         if (empty($stagiaires)) {
+//             return response()->json(['message' => 'Aucun stagiaire attribué à ce coach'], 404);
+//         }
+
+//         // ✅ Récupère les pointages des stagiaires attribués pour la date donnée
+//         $pointages = Pointage::whereIn('user_id', $stagiaires)
+//             ->whereDate('date_pointage', $date)
+//             ->get();
+
+//         // ✅ Construit la réponse complète (présents, absents, retards)
+//         $result = collect($stagiaires)->map(function ($stagiaireId) use ($pointages, $date) {
+//             $stagiaire = User::find($stagiaireId);
+//             $pointage = $pointages->where('user_id', $stagiaireId)->first();
+
+//             return [
+//                 'user_id' => $stagiaire->id,
+//                 'nom' => $stagiaire->last_name,
+//                 'prenom' => $stagiaire->first_name,
+//                 'statut' => $pointage ? $pointage->statut : 'absent',
+//                 'heure_arrivee' => $pointage ? $pointage->heure_arrivee : null,
+//                 'heure_sortie' => $pointage ? $pointage->heure_sortie : null,
+//                 'note' => $pointage ? $pointage->note : null,
+//             ];
+//         });
+
+//         return response()->json($result);
+//     }
+
 
 
 
@@ -670,8 +843,13 @@ public function scanQr(Request $request)
             ->whereDate('date_pointage', now()->toDateString())
             ->first();
 
-        $heureActuelle = Carbon::now()->format('H:i');
-        $heureLimite = '08:30'; // Heure limite pour être à l'heure
+         // ✅ On garde Carbon ici (ne pas formatter tout de suite)
+        $heureActuelle = Carbon::now();
+        $heureLimite = Carbon::createFromTime(8, 30, 0);
+
+
+        // $heureActuelle = Carbon::now()->format('H:i');
+        // $heureLimite = '08:30'; // Heure limite pour être à l'heure
 
         // 👉 Si aucun pointage aujourd’hui → c’est l’entrée
         if (!$pointage) {
@@ -691,17 +869,46 @@ public function scanQr(Request $request)
                 'heure_arrivee' => $heureActuelle,
             ]);
         }
-        // 👉 Si l’entrée existe mais pas la sortie → on enregistre la sortie
-        if (is_null($pointage->heure_sortie)) {
-            $pointage->update([
-                'heure_sortie' => $heureActuelle,
-            ]);
-
-            return response()->json([
-                'message' => 'Heure de sortie enregistrée automatiquement ✅',
-                'heure_sortie' => $heureActuelle,
-            ]);
+        // --- 2️⃣ Si l’entrée vient d’être faite → ignore le deuxième scan ---
+        if (!is_null($pointage->heure_arrivee) && is_null($pointage->heure_sortie)) {
+             $heureArrivee = Carbon::parse($pointage->heure_arrivee); 
+            // $heureArrivee = Carbon::createFromFormat('H:i:s', $pointage->heure_arrivee);
+            if ($heureActuelle->diffInMinutes($heureArrivee) < 3) {
+                return response()->json([
+                    'message' => 'Tu viens déjà de pointer ton arrivée. Attends quelques minutes avant de rescanner ⏳',
+                ], 400);
+            }
         }
+        // 👉 Si l’entrée existe mais pas la sortie → on enregistre la sortie
+        // if (is_null($pointage->heure_sortie)) {
+        //     $pointage->update([
+        //         'heure_sortie' => $heureActuelle,
+        //     ]);
+
+        //     return response()->json([
+        //         'message' => 'Heure de sortie enregistrée ✅',
+        //         'heure_sortie' => $heureActuelle,
+        //     ]);
+        // }
+         // --- 3️⃣ Enregistrer la sortie après un délai minimal (ex: 4h) ---
+    if (!is_null($pointage->heure_arrivee) && is_null($pointage->heure_sortie)) {
+        $heureArrivee = Carbon::parse($pointage->heure_arrivee);
+
+        if ($heureActuelle->diffInHours($heureArrivee) < 4) {
+            return response()->json([
+                'message' => 'Tu ne peux pas encore pointer ta sortie. Reviens plus tard ⏰',
+            ], 400);
+        }
+
+        $pointage->update([
+            'heure_sortie' => $heureActuelle->format('H:i:s'),
+        ]);
+
+        return response()->json([
+            'message' => 'Heure de sortie enregistrée ✅',
+            'heure_sortie' => $heureActuelle->format('H:i:s'),
+        ]);
+    }
 
         // 👉 Si les deux sont déjà enregistrés
         return response()->json([
