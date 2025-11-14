@@ -59,7 +59,8 @@ Route::middleware(['jwt.auth', 'coache'])->group(function () {
     // Route::post('/pointages/scan', [PointageController::class, 'validerScan']);
 
     Route::post('/qr-tokens', [QRTokenController::class, 'generate']);
-    Route::get('/coach/stagiaires/presences', [PointageController::class, 'getStagiairesPresences']);
+    // Route::get('/coach/stagiaires/presences', [PointageController::class, 'getStagiairesPresences']);
+    Route::get('/coach/presences', [PointageController::class, 'getStagiairesPresences']);
 
 
     // Route::put('coachs/{id}', [Controller::class, 'updateCoach']);

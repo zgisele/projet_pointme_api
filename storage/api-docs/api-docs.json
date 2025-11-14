@@ -771,132 +771,6 @@
                 ]
             }
         },
-        "/api/listePointages": {
-            "get": {
-                "tags": [
-                    "Coach"
-                ],
-                "summary": "Lister les pointages des stagiaires du coach connecté",
-                "description": "Cet endpoint permet au coach connecté de visualiser tous les pointages de ses stagiaires (présents, absents, en retard).",
-                "operationId": "742df304e5cf8f5b76de58eb3a923dc0",
-                "responses": {
-                    "200": {
-                        "description": "Liste des pointages récupérée avec succès",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "pointages": {
-                                            "type": "array",
-                                            "items": {
-                                                "properties": {
-                                                    "id": {
-                                                        "type": "integer",
-                                                        "example": 12
-                                                    },
-                                                    "user_id": {
-                                                        "type": "integer",
-                                                        "example": 7
-                                                    },
-                                                    "coach_id": {
-                                                        "type": "integer",
-                                                        "example": 3
-                                                    },
-                                                    "statut": {
-                                                        "type": "string",
-                                                        "example": "présent"
-                                                    },
-                                                    "heure_arrivee": {
-                                                        "type": "string",
-                                                        "format": "time",
-                                                        "example": "08:45:00"
-                                                    },
-                                                    "heure_sortie": {
-                                                        "type": "string",
-                                                        "format": "time",
-                                                        "example": "17:00:00"
-                                                    },
-                                                    "note": {
-                                                        "type": "string",
-                                                        "example": "Arrivé légèrement en retard",
-                                                        "nullable": true
-                                                    },
-                                                    "date_pointage": {
-                                                        "type": "string",
-                                                        "format": "date",
-                                                        "example": "2025-10-30"
-                                                    },
-                                                    "stagiaire": {
-                                                        "properties": {
-                                                            "id": {
-                                                                "type": "integer",
-                                                                "example": 7
-                                                            },
-                                                            "first_name": {
-                                                                "type": "string",
-                                                                "example": "Awa"
-                                                            },
-                                                            "last_name": {
-                                                                "type": "string",
-                                                                "example": "Diop"
-                                                            },
-                                                            "email": {
-                                                                "type": "string",
-                                                                "example": "awa.diop@example.com"
-                                                            }
-                                                        },
-                                                        "type": "object"
-                                                    }
-                                                },
-                                                "type": "object"
-                                            }
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "403": {
-                        "description": "Accès non autorisé — l’utilisateur n’est pas un coach",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Accès non autorisé"
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    },
-                    "401": {
-                        "description": "Non authentifié — le token JWT est manquant ou invalide",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "properties": {
-                                        "message": {
-                                            "type": "string",
-                                            "example": "Unauthenticated."
-                                        }
-                                    },
-                                    "type": "object"
-                                }
-                            }
-                        }
-                    }
-                },
-                "security": [
-                    {
-                        "bearerAuth": []
-                    }
-                ]
-            }
-        },
         "/api/stagiaire/historique": {
             "post": {
                 "tags": [
@@ -1028,83 +902,77 @@
                 ]
             }
         },
-        "/api/coach/stagiaires/presences": {
+        "/api/coach/presences": {
             "get": {
                 "tags": [
                     "Coach"
                 ],
-                "summary": "Consulter les présences des stagiaires d'un coach pour une journée donnée",
-                "description": "Permet au coach connecté de consulter les présences, retards et absences de ses stagiaires pour une journée spécifique.",
-                "operationId": "getStagiairesPresences",
+                "summary": "Récupérer les pointages des stagiaires attribués à un coach",
+                "description": "\n *         - Si une date est fournie : retourne uniquement les pointages enregistrés ce jour-là.\n *         - Si aucune date n'est fournie : retourne tous les pointages de tous les stagiaires associés au coach.\n *     ",
+                "operationId": "06aca03b3f4f212f883f0d80581ed920",
                 "parameters": [
                     {
                         "name": "date",
                         "in": "query",
-                        "description": "Date à consulter au format YYYY-MM-DD",
-                        "required": true,
+                        "description": "Date des pointages à récupérer (format Y-m-d). Si absente, retourne tous les pointages.",
+                        "required": false,
                         "schema": {
                             "type": "string",
-                            "format": "date",
-                            "example": "2025-11-11"
-                        }
+                            "format": "date"
+                        },
+                        "example": "2025-02-01"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Liste des pointages pour les stagiaires du coach",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "type": "array",
-                                    "items": {
-                                        "properties": {
-                                            "user_id": {
-                                                "type": "integer",
-                                                "example": 5
-                                            },
-                                            "nom": {
-                                                "type": "string",
-                                                "example": "Doe"
-                                            },
-                                            "prenom": {
-                                                "type": "string",
-                                                "example": "John"
-                                            },
-                                            "statut": {
-                                                "type": "string",
-                                                "example": "present"
-                                            },
-                                            "heure_arrivee": {
-                                                "type": "string",
-                                                "example": "08:30",
-                                                "nullable": true
-                                            },
-                                            "heure_sortie": {
-                                                "type": "string",
-                                                "example": "17:00",
-                                                "nullable": true
-                                            },
-                                            "note": {
-                                                "type": "string",
-                                                "example": "Pointage automatique via QR code",
-                                                "nullable": true
-                                            }
-                                        },
-                                        "type": "object"
-                                    }
-                                }
-                            }
-                        }
-                    },
-                    "400": {
-                        "description": "Date non fournie ou invalide",
+                        "description": "Liste des pointages trouvés",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
-                                        "message": {
+                                        "coach_id": {
+                                            "type": "integer",
+                                            "example": 4
+                                        },
+                                        "date": {
                                             "type": "string",
-                                            "example": "La date est requise et doit être au format YYYY-MM-DD"
+                                            "example": "2025-02-01"
+                                        },
+                                        "pointages": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 12
+                                                    },
+                                                    "user_id": {
+                                                        "type": "integer",
+                                                        "example": 7
+                                                    },
+                                                    "date_pointage": {
+                                                        "type": "string",
+                                                        "example": "2025-02-01"
+                                                    },
+                                                    "statut": {
+                                                        "type": "string",
+                                                        "example": "present"
+                                                    },
+                                                    "heure_arrivee": {
+                                                        "type": "string",
+                                                        "example": "08:45:00"
+                                                    },
+                                                    "heure_sortie": {
+                                                        "type": "string",
+                                                        "example": "16:30:00"
+                                                    },
+                                                    "note": {
+                                                        "type": "string",
+                                                        "example": "RAS"
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
                                         }
                                     },
                                     "type": "object"
@@ -1112,15 +980,31 @@
                             }
                         }
                     },
-                    "401": {
-                        "description": "Non authentifié",
+                    "403": {
+                        "description": "Accès refusé (utilisateur non coach)",
                         "content": {
                             "application/json": {
                                 "schema": {
                                     "properties": {
                                         "message": {
                                             "type": "string",
-                                            "example": "Non authentifié"
+                                            "example": "Accès réservé aux coachs uniquement"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Aucun stagiaire attribué à ce coach",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Aucun stagiaire attribué"
                                         }
                                     },
                                     "type": "object"

@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use App\Models\User;
 
 
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
@@ -67,18 +69,44 @@ class Controller extends BaseController
 */
 
 
-        public function getStagiaires(Request $request, $id)
-    {
-        $user = auth()->user();
+    //     public function getStagiaires(Request $request, $id)
+    // {
+    //     $user = auth()->user();
 
-        if ($user->id != $id || $user->role != 'coache') {
-            return response()->json(['message' => 'Accès non autorisé2.'], 403);
-        }
+    //     if ($user->id != $id || $user->role != 'coache') {
+    //         return response()->json(['message' => 'Accès non autorisé2.'], 403);
+    //     }
 
-        $stagiaires = $user->stagiaires()->get(['id', 'first_name', 'last_name', 'email']);
+    //     $stagiaires = $user->stagiaires()->get(['id', 'first_name', 'last_name', 'email']);
 
-        return response()->json(['stagiaires' => $stagiaires], 200);
+    //     return response()->json(['stagiaires' => $stagiaires], 200);
+    // }
+
+    public function getStagiaires(Request $request, $id)
+{
+    $user = auth()->user();
+
+    // Vérification d'accès
+    if ($user->id != $id || $user->role !== 'coache') {
+        return response()->json(['message' => 'Accès non autorisé.'], 403);
     }
+
+    // 👉 Récupération des stagiaires via la table pivot coach_stagiaire
+    $stagiaireIds = DB::table('coach_stagiaire')
+        ->where('coach_id', $user->id)
+        ->pluck('stagiaire_id');
+
+    if ($stagiaireIds->isEmpty()) {
+        return response()->json(['stagiaires' => []], 200);
+    }
+
+    // 👉 Récupération des informations des stagiaires
+    $stagiaires = User::whereIn('id', $stagiaireIds)
+        ->get(['id', 'first_name', 'last_name', 'email']);
+
+    return response()->json(['stagiaires' => $stagiaires], 200);
+}
+
 
 
 /**
@@ -139,16 +167,46 @@ class Controller extends BaseController
  * )
 */
 
-    public function showStagiaire(Request $request, $id)
+//     public function showStagiaire(Request $request, $id)
+// {
+//     $user = auth()->user();
+
+//     if (!$user || $user->role !== 'coache') {
+//         return response()->json(['message' => 'Accès non autorisé.'], 403);
+//     }
+
+//     $stagiaire = \App\Models\User::where('id', $id)
+//         ->where('coach_id', $user->id)
+//         ->where('role', 'stagiaire')
+//         ->first();
+
+//     if (!$stagiaire) {
+//         return response()->json(['message' => 'Stagiaire introuvable.'], 404);
+//     }
+
+//     return response()->json($stagiaire, 200);
+// }
+public function showStagiaire(Request $request, $id)
 {
     $user = auth()->user();
 
+    // Vérification d'accès
     if (!$user || $user->role !== 'coache') {
         return response()->json(['message' => 'Accès non autorisé.'], 403);
     }
 
-    $stagiaire = \App\Models\User::where('id', $id)
+    // 👉 Vérifier dans la table pivot que ce stagiaire appartient à ce coach
+    $isLinked = DB::table('coach_stagiaire')
         ->where('coach_id', $user->id)
+        ->where('stagiaire_id', $id)
+        ->exists();
+
+    if (!$isLinked) {
+        return response()->json(['message' => 'Stagiaire introuvable ou non attribué à ce coach.'], 404);
+    }
+
+    // 👉 Récupérer les informations du stagiaire
+    $stagiaire = User::where('id', $id)
         ->where('role', 'stagiaire')
         ->first();
 
@@ -158,5 +216,6 @@ class Controller extends BaseController
 
     return response()->json($stagiaire, 200);
 }
+
 
 }
