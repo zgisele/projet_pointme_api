@@ -261,221 +261,174 @@ public function getStagiairesPresences(Request $request)
 }
 
 
+/**
+ * @OA\Post(
+ *     path="/api/ValidationPointages/{id}",
+ *     summary="Corriger ou valider un pointage",
+ *     description="Permet au coach de modifier un pointage : heure d’arrivée, heure de sortie, statut et note.",
+ *     operationId="updatePointage",
+ *     tags={"Coach"},
+ *     security={{ "bearerAuth": {} }},
+ *
+ *     @OA\Parameter(
+ *         name="id",
+ *         in="path",
+ *         required=true,
+ *         description="Identifiant du pointage",
+ *         @OA\Schema(type="integer")
+ *     ),
+ *
+ *     @OA\RequestBody(
+ *         required=false,
+ *         @OA\MediaType(
+ *             mediaType="multipart/form-data",
+ *             @OA\Schema(
+ *                 required={},
+ *                 @OA\Property(
+ *                     property="heure_arrivee",
+ *                     type="string",
+ *                     example="08:30",
+ *                     description="Heure d'arrivée (H:i)"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="heure_sortie",
+ *                     type="string",
+ *                     example="17:00",
+ *                     description="Heure de sortie (H:i), doit être supérieure à heure_arrivee"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="statut",
+ *                     type="string",
+ *                     description="Statut du pointage",
+ *                     enum={"present", "retard", "absent"},
+ *                     example="retard"
+ *                 ),
+ *                 @OA\Property(
+ *                     property="note",
+ *                     type="string",
+ *                     example="Le stagiaire est arrivé en retard mais a prévenu.",
+ *                     description="Note ou observation"
+ *                 )
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=200,
+ *         description="Pointage mis à jour avec succès",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Pointage mis à jour avec succès."),
+ *             @OA\Property(
+ *                 property="pointage",
+ *                 type="object",
+ *                 @OA\Property(property="id", type="integer", example=10),
+ *                 @OA\Property(property="user_id", type="integer", example=5),
+ *                 @OA\Property(property="heure_arrivee", type="string", example="08:30"),
+ *                 @OA\Property(property="heure_sortie", type="string", example="17:00"),
+ *                 @OA\Property(property="statut", type="string", example="retard"),
+ *                 @OA\Property(property="note", type="string", example="Le stagiaire est arrivé en retard mais a prévenu."),
+ *                 @OA\Property(property="modified_by", type="integer", example=2),
+ *                 @OA\Property(property="updated_at", type="string", example="2025-11-15 10:00:00")
+ *             )
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=403,
+ *         description="Accès refusé",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Accès réservé aux coachs uniquement.")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=404,
+ *         description="Pointage introuvable",
+ *         @OA\JsonContent(
+ *             @OA\Property(property="message", type="string", example="Pointage introuvable")
+ *         )
+ *     ),
+ *
+ *     @OA\Response(
+ *         response=422,
+ *         description="Erreur de validation",
+ *         @OA\JsonContent(
+ *             @OA\Property(
+ *                 property="errors",
+ *                 type="object",
+ *                 example={
+ *                     "heure_sortie": {"The heure sortie must be after heure arrivee."}
+ *                 }
+ *             )
+ *         )
+ *     )
+ * )
+*/
 
-   
+public function ValidationPointage(Request $request, $id)
+{
+    $coach = auth()->user();
 
-// /**
-//  * @OA\Get(
-//  *     path="/api/pointages/daily",
-//  *     summary="Lister les pointages d'une journée spécifique",
-//  *     description="Cet endpoint permet au coach connecté de consulter les présences, absences et retards de ses stagiaires pour une date donnée.",
-//  *     tags={"Coach"},
-//  *     security={{"bearerAuth":{}}},
-//  *
-//  *     @OA\Parameter(
-//  *         name="date",
-//  *         in="query",
-//  *         required=true,
-//  *         description="Date des pointages à consulter (format YYYY-MM-DD)",
-//  *         @OA\Schema(type="string", format="date", example="2025-10-30")
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=200,
-//  *         description="Liste des pointages du jour récupérée avec succès",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(
-//  *                 property="pointages",
-//  *                 type="array",
-//  *                 @OA\Items(
-//  *                     type="object",
-//  *                     @OA\Property(property="id", type="integer", example=8),
-//  *                     @OA\Property(property="user_id", type="integer", example=15),
-//  *                     @OA\Property(property="coach_id", type="integer", example=3),
-//  *                     @OA\Property(property="statut", type="string", example="retard"),
-//  *                     @OA\Property(property="heure_arrivee", type="string", format="time", example="09:10:00"),
-//  *                     @OA\Property(property="heure_sortie", type="string", format="time", example="17:00:00"),
-//  *                     @OA\Property(property="note", type="string", nullable=true, example="Arrivée tardive à cause du transport"),
-//  *                     @OA\Property(property="date_pointage", type="string", format="date", example="2025-10-30"),
-//  *                     @OA\Property(
-//  *                         property="stagiaire",
-//  *                         type="object",
-//  *                         @OA\Property(property="id", type="integer", example=15),
-//  *                         @OA\Property(property="first_name", type="string", example="Moussa"),
-//  *                         @OA\Property(property="last_name", type="string", example="Ba"),
-//  *                         @OA\Property(property="email", type="string", example="moussa.ba@example.com")
-//  *                     )
-//  *                 )
-//  *             )
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=400,
-//  *         description="Paramètre date manquant",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Paramètre date requis")
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=403,
-//  *         description="Accès non autorisé — l’utilisateur n’est pas un coach",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Accès non autorisé")
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=401,
-//  *         description="Non authentifié — token JWT invalide ou manquant",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-//  *         )
-//  *     )
-//  * )
-// */
-
-    
-    // GET /api/pointages/daily?date=YYYY-MM-DD
-    public function daily(Request $request)
-    {
-        $coach = auth()->user();
-        $date = $request->query('date');
-
-        if (!$date) {
-            return response()->json(['message' => 'Paramètre date requis'], 400);
-        }
-
-        $pointages = Pointage::where('coach_id', $coach->id)
-            ->where('date', $date)
-            ->with('stagiaire:id,first_name,last_name,email')
-            ->get();
-
-        return response()->json(['pointages' => $pointages], 200);
+    // Vérifier que l'utilisateur est un coach
+    if (!$coach || $coach->role !== 'coache') {
+        return response()->json([
+            'message' => 'Accès réservé aux coachs uniquement.'
+        ], 403);
     }
-    
-    // /**
-    //  * Met à jour un pointage spécifique
-    //  *
-    //  * @urlParam id int required ID du pointage. Example: 1
-    //  * @bodyParam heure_arrivee string Heure d'arrivée. Example: "08:30:00"
-    //  * @bodyParam statut string Statut du pointage. Example: "present"
-    //  * @bodyParam note string Note du coach. Example: "Arrivé à l'heure"
-    //  * @authenticated
-    //  * @response 200 {
-    //  *   "message": "Pointage mis à jour",
-    //  *   "pointage": {
-    //  *       "id": 1,
-    //  *       "user_id": 5,
-    //  *       "statut": "present",
-    //  *       "heure_arrivee": "08:30:00",
-    //  *       "note": "Arrivé à l'heure",
-    //  *       "date": "2025-10-30"
-    //  *   }
-    //  * }
-    //  * @response 403 {"message": "Accès non autorisé"}
-    //  * @response 404 {"message": "Pointage non trouvé"}
-    // */
-// /**
-//  * @OA\Put(
-//  *     path="/api/pointages/{id}",
-//  *     summary="Mettre à jour un pointage",
-//  *     description="Permet au coach de corriger ou valider un pointage (heure d’arrivée, statut, note).",
-//  *     tags={"Coach"},
-//  *     security={{"bearerAuth":{}}},
-//  *
-//  *     @OA\Parameter(
-//  *         name="id",
-//  *         in="path",
-//  *         required=true,
-//  *         description="Identifiant du pointage à modifier",
-//  *         @OA\Schema(type="integer", example=12)
-//  *     ),
-//  *
-//  *     @OA\RequestBody(
-//  *         required=true,
-//  *         description="Données à mettre à jour dans le pointage",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="heure_arrivee", type="string", format="time", example="08:45:00", description="Heure d’arrivée du stagiaire"),
-//  *             @OA\Property(property="statut", type="string", example="présent", description="Statut du stagiaire (présent, absent, retard)"),
-//  *             @OA\Property(property="note", type="string", nullable=true, example="Arrivée en retard mais justifiée")
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=200,
-//  *         description="Pointage mis à jour avec succès",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Pointage mis à jour"),
-//  *             @OA\Property(
-//  *                 property="pointage",
-//  *                 type="object",
-//  *                 @OA\Property(property="id", type="integer", example=12),
-//  *                 @OA\Property(property="user_id", type="integer", example=7),
-//  *                 @OA\Property(property="coach_id", type="integer", example=3),
-//  *                 @OA\Property(property="statut", type="string", example="présent"),
-//  *                 @OA\Property(property="heure_arrivee", type="string", example="08:45:00"),
-//  *                 @OA\Property(property="note", type="string", example="Correction de l’heure d’arrivée"),
-//  *                 @OA\Property(property="date_pointage", type="string", format="date", example="2025-10-30")
-//  *             )
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=404,
-//  *         description="Pointage introuvable",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Pointage non trouvé")
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=403,
-//  *         description="Accès non autorisé — le coach n’est pas propriétaire du pointage",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Accès non autorisé")
-//  *         )
-//  *     ),
-//  *
-//  *     @OA\Response(
-//  *         response=401,
-//  *         description="Non authentifié — token JWT invalide ou manquant",
-//  *         @OA\JsonContent(
-//  *             type="object",
-//  *             @OA\Property(property="message", type="string", example="Unauthenticated.")
-//  *         )
-//  *     )
-//  * )
-// */
 
-    // PUT /api/pointages/{id}
-    public function updatePointages(Request $request, $id)
-    {
-        $coach = auth()->user();
+    // Validation des données
+    $validated = $request->validate([
+        'heure_arrivee' => 'nullable|date_format:H:i',
+        'heure_sortie'  => 'nullable|date_format:H:i|after:heure_arrivee',
+        'statut'        => 'nullable|in:present,retard,absent',
+        'note'          => 'nullable|string|max:255',
+    ]);
 
-        $pointage = Pointage::find($id);
+    // Récupérer le pointage
+    $pointage = Pointage::find($id);
 
-        if (!$pointage) {
-            return response()->json(['message' => 'Pointage non trouvé'], 404);
-        }
-
-        if ($pointage->coach_id != $coach->id) {
-            return response()->json(['message' => 'Accès non autorisé'], 403);
-        }
-
-        $pointage->update($request->only(['heure_arrivee', 'statut', 'note']));
-
-        return response()->json(['message' => 'Pointage mis à jour', 'pointage' => $pointage], 200);
+    if (!$pointage) {
+        return response()->json(['message' => 'Pointage introuvable'], 404);
     }
+
+    // Vérifier que le stagiaire appartient bien au coach
+    $isStagiaireCoach =  DB::table('coach_stagiaire')
+        ->where('coach_id', $coach->id)
+        ->where('stagiaire_id', $pointage->user_id)
+        ->exists();
+
+    if (!$isStagiaireCoach) {
+        return response()->json([
+            'message' => 'Ce stagiaire ne vous est pas attribué.'
+        ], 403);
+    }
+
+    // Mise à jour du pointage
+    if (isset($validated['heure_arrivee'])) {
+        $pointage->heure_arrivee = $validated['heure_arrivee'];
+    }
+
+    if (isset($validated['heure_sortie'])) {
+        $pointage->heure_sortie = $validated['heure_sortie'];
+    }
+
+    if (isset($validated['statut'])) {
+        $pointage->statut = $validated['statut'];
+    }
+
+    if (isset($validated['note'])) {
+        $pointage->note = $validated['note'];
+    }
+
+    // $pointage->modified_by = $coach->id; // si tu veux savoir qui a modifié
+    $pointage->save();
+
+    return response()->json([
+        'message' => 'Pointage mis à jour avec succès.',
+        'pointage' => $pointage
+    ]);
+}
+
 
 
 /**

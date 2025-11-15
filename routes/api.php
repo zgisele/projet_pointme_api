@@ -92,6 +92,7 @@ Route::middleware(['jwt.auth', 'coache'])->group(function () {
     Route::post('/qr-tokens', [QRTokenController::class, 'generate']);
     // Route::get('/coach/stagiaires/presences', [PointageController::class, 'getStagiairesPresences']);
     Route::get('/coach/presences', [PointageController::class, 'getStagiairesPresences']);
+    Route::post('ValidationPointages/{id}', [PointageController::class, 'ValidationPointage']);
 
 
     // Route::put('coachs/{id}', [Controller::class, 'updateCoach']);

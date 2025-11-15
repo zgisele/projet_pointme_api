@@ -1020,6 +1020,177 @@
                 ]
             }
         },
+        "/api/ValidationPointages/{id}": {
+            "post": {
+                "tags": [
+                    "Coach"
+                ],
+                "summary": "Corriger ou valider un pointage",
+                "description": "Permet au coach de modifier un pointage : heure d’arrivée, heure de sortie, statut et note.",
+                "operationId": "updatePointage",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant du pointage",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": false,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [],
+                                "properties": {
+                                    "heure_arrivee": {
+                                        "description": "Heure d'arrivée (H:i)",
+                                        "type": "string",
+                                        "example": "08:30"
+                                    },
+                                    "heure_sortie": {
+                                        "description": "Heure de sortie (H:i), doit être supérieure à heure_arrivee",
+                                        "type": "string",
+                                        "example": "17:00"
+                                    },
+                                    "statut": {
+                                        "description": "Statut du pointage",
+                                        "type": "string",
+                                        "enum": [
+                                            "present",
+                                            "retard",
+                                            "absent"
+                                        ],
+                                        "example": "retard"
+                                    },
+                                    "note": {
+                                        "description": "Note ou observation",
+                                        "type": "string",
+                                        "example": "Le stagiaire est arrivé en retard mais a prévenu."
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pointage mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pointage mis à jour avec succès."
+                                        },
+                                        "pointage": {
+                                            "properties": {
+                                                "id": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "heure_arrivee": {
+                                                    "type": "string",
+                                                    "example": "08:30"
+                                                },
+                                                "heure_sortie": {
+                                                    "type": "string",
+                                                    "example": "17:00"
+                                                },
+                                                "statut": {
+                                                    "type": "string",
+                                                    "example": "retard"
+                                                },
+                                                "note": {
+                                                    "type": "string",
+                                                    "example": "Le stagiaire est arrivé en retard mais a prévenu."
+                                                },
+                                                "modified_by": {
+                                                    "type": "integer",
+                                                    "example": 2
+                                                },
+                                                "updated_at": {
+                                                    "type": "string",
+                                                    "example": "2025-11-15 10:00:00"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "Accès refusé",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Accès réservé aux coachs uniquement."
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Pointage introuvable",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Pointage introuvable"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Erreur de validation",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "errors": {
+                                            "type": "object",
+                                            "example": {
+                                                "heure_sortie": [
+                                                    "The heure sortie must be after heure arrivee."
+                                                ]
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
         "/api/pointages/scanQr": {
             "post": {
                 "tags": [
