@@ -23,6 +23,32 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\Controller;
 use App\Http\Controllers\QRTokenController;
 use App\Http\Controllers\PointageController;
+use Illuminate\Support\Facades\Artisan;
+
+Route::get('/cron/generate-qr', function (Request $request) {
+    if ($request->query('key') !== env('CRON_KEY')) {
+        return response()->json(['error' => 'Unauthorized'], 401);
+    }
+
+    Artisan::call('generate:qr-token');
+
+    return response()->json([
+        'message' => 'QR token generated'
+    ]);
+});
+
+
+
+
+
+// Route::get('/cron/generate-qr', function () {
+//     Artisan::call('generate:qr-token');
+//     return response()->json([
+//         'message' => 'QR token generated'
+//     ]);
+// });
+
+
 
 Route::post('register/admin', [AuthController::class, 'registerAdmin']);
 // Route::post('register/coache', [AuthController::class, 'registerCoache']);
