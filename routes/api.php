@@ -37,6 +37,11 @@ Route::get('/cron/generate-qr', function (Request $request) {
     ]);
 });
 
+Route::get('/PointageAbsences', function () {
+    Artisan::call('app:pointage-absences');
+    return "Absences enregistre";
+});
+
 
 
 

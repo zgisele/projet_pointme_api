@@ -21,6 +21,7 @@ class Kernel extends ConsoleKernel
         // ou utiliser ->dailyAt('00:00') pour horaire précis.
         $schedule->command('generate:qr-token')->dailyAt('00:00');
         // $schedule->command('generate:qr-token')->everyMinute();
+        $schedule->command('app:pointage-absences')->dailyAt('17:00');
     }
 
     /**
