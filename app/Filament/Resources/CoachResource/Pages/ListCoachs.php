@@ -16,4 +16,12 @@ class ListCoachs extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+
+
+
+    public function getTitle(): string
+    {
+        return 'Liste des coachs';
+    }
 }

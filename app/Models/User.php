@@ -107,14 +107,26 @@ class User extends Authenticatable implements JWTSubject,FilamentUser, HasName, 
     //     return $this->belongsToMany(User::class, 'coach_stagiaire', 'coach_id', 'stagiaire_id','is_active',);
     // }
 
-    public function stagiaires()
+
+    // Pour les coachs : liste simple de leurs stagiaires
+        public function stagiaires()
+    {
+        return $this->hasMany(User::class, 'coach_id')->where('role', 'stagiaire');
+    }
+
+    // Pour les filtres et la période d'affectation via la table pivot
+public function stagiairesPivot()
 {
-    return $this->hasMany(User::class, 'coach_id')->where('role', 'stagiaire');
+    return $this->belongsToMany(User::class, 'coach_stagiaire', 'coach_id', 'stagiaire_id')
+                ->withPivot('date_affectation')
+                ->where('role', 'stagiaire');
 }
 
+// Pour les stagiaires : tous leurs coachs via pivot
     public function coachs()
     {
-        return $this->belongsToMany(User::class, 'coach_stagiaire', 'stagiaire_id', 'coach_id');
+        return $this->belongsToMany(User::class, 'coach_stagiaire', 'stagiaire_id', 'coach_id')
+        ->withPivot('date_affectation');
     }
 
     // Pointages du stagiaire

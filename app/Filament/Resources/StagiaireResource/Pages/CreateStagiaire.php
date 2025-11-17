@@ -14,4 +14,9 @@ class CreateStagiaire extends CreateRecord
         $data['role'] = 'stagiaire'; // 👈 Ajoute automatiquement le rôle stagiaire
         return $data;
     }
+
+    public function getTitle(): string
+{
+    return 'Créer un stagiaire';
+}
 }

@@ -8,4 +8,9 @@ use Filament\Resources\Pages\EditRecord;
 class EditCoach extends EditRecord
 {
     protected static string $resource = CoachResource::class;
+
+    public function getTitle(): string
+{
+    return 'Modifier un coach';
+}
 }

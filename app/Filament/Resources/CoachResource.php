@@ -80,7 +80,7 @@ class CoachResource extends Resource
                 Tables\Columns\TextColumn::make('first_name')->label('Prénom')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('last_name')->label('Nom')->sortable()->searchable(),
                 Tables\Columns\TextColumn::make('email')->label('Email'),
-                Tables\Columns\TextColumn::make('password'),
+                // Tables\Columns\TextColumn::make('password'),
                 Tables\Columns\TextColumn::make('phone')->label('Téléphone'),
 
                  // ✅ Nombre de stagiaires (on ajoutera le code selon ta relation)

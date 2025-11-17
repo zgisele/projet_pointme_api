@@ -8,4 +8,9 @@ use Filament\Resources\Pages\EditRecord;
 class EditStagiaire extends EditRecord
 {
     protected static string $resource = StagiaireResource::class;
+
+    public function getTitle(): string
+{
+    return 'Modifier un stagiaire';
+}
 }
